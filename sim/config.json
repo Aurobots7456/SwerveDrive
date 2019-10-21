@@ -1,11 +1,11 @@
 {
 	"pyfrc": {
 		"robot": {
-			"w": 3.6,
-			"h": 3,
-			"starting_x": 25,
-			"starting_y": 25,
-			"starting_angle": 180
+			"w": 3,
+			"h": 2,
+			"starting_x": 10,
+			"starting_y": 10,
+			"starting_angle": 0
 		},
 		"analog": {
 			"0": "Front Left Rotation Encoder",
@@ -24,7 +24,7 @@
             "7": "Rear Right Rotate Motor"            
 		},
 		"field": {
-			"w": 27,
+			"w": 25,
 			"h": 27,
 			"px_per_ft": 10
 		}
