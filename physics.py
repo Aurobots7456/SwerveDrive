@@ -9,6 +9,11 @@ from pyfrc.physics.units import units
 
 class PhysicsEngine(object):
 
+    FrontLeftMotor = ntproperty('/SmartDashboard/drive/FrontLeft_Module/raw voltage', 0)
+    FrontRightMotor = ntproperty('/SmartDashboard/drive/FrontRight_Module/raw voltage', 0)
+    RearLeftMotor = ntproperty('/SmartDashboard/drive/RearLeft_Module/raw voltage', 0)
+    RearRightMotor = ntproperty('/SmartDashboard/drive/RearRight_Module/raw voltage', 0)
+
     FrontLeft_degrees = ntproperty("/SmartDashboard/drive/FrontLeft_Module/degrees", 0)
     FrontRight_degrees = ntproperty("/SmartDashboard/drive/FrontRight_Module/degrees", 0)
     RearLeft_degrees = ntproperty("/SmartDashboard/drive/RearLeft_Module/degrees", 0)
@@ -16,6 +21,20 @@ class PhysicsEngine(object):
 
     def __init__(self, physics_controller):
         self.physics_controller = physics_controller
+
+        self.drivetrain = drivetrains.four_motor_swerve_drivetrain(
+            self.RearLeftMotor,
+            self.RearRightMotor,
+            self.FrontLeftMotor,
+            self.FrontRightMotor,
+            self.RearLeft_degrees,
+            self.RearRight_degrees,
+            self.FrontLeft_degrees,
+            self.FrontRight_degrees,
+            x_wheelbase=2,
+            y_wheelbase=3,
+            speed=5
+        )
 
     def initialize(self, hal_data):
         self.FrontLeft_encoder = 0
@@ -57,12 +76,12 @@ class PhysicsEngine(object):
             hal_data['CAN'][2]['enc_position'] -= hal_data['CAN'][2]['value'] / 1023 * tm_diff * 300000
             hal_data['CAN'][3]['enc_position'] += hal_data['CAN'][3]['value'] / 1023 * tm_diff * 300000
 
-            FrontLeftMotor = -hal_data['CAN'][0]['value'] / 1023
-            FrontRightMotor = hal_data['CAN'][1]['value'] / 1023
-            RearLeftMotor = -hal_data['CAN'][2]['value'] / 1023
-            RearRightMotor = hal_data['CAN'][3]['value'] / 1023
+            self.FrontLeftMotor = -hal_data['CAN'][0]['value'] / 1023
+            self.FrontRightMotor = hal_data['CAN'][1]['value'] / 1023
+            self.RearLeftMotor = -hal_data['CAN'][2]['value'] / 1023
+            self.RearRightMotor = hal_data['CAN'][3]['value'] / 1023
 
-            vx, vy, vw = drivetrains.four_motor_swerve_drivetrain(RearLeftMotor, RearRightMotor, FrontLeftMotor, FrontRightMotor, self.RearLeft_degrees, self.RearRight_degrees, self.FrontLeft_degrees, self.FrontRight_degrees, x_wheelbase=2, y_wheelbase=3, speed=5)
+            vx, vy, vw = self.drivetrain
             # vx, vy, vw = four_motor_swerve_drivetrain1(FrontLeftMotor, FrontRightMotor, RearLeftMotor, RearRightMotor, self.FrontLeft_degrees, self.FrontRight_degrees, self.RearLeft_degrees, self.RearRight_degrees, x_wheelbase=3, y_wheelbase=3.6, speed=9)
             self.physics_controller.vector_drive(vx, vy, vw, tm_diff)
 
