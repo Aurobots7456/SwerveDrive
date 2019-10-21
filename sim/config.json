@@ -1,0 +1,32 @@
+{
+	"pyfrc": {
+		"robot": {
+			"w": 3.6,
+			"h": 3,
+			"starting_x": 25,
+			"starting_y": 25,
+			"starting_angle": 180
+		},
+		"analog": {
+			"0": "Front Left Rotation Encoder",
+			"1": "Front Right Rotation Encoder",
+			"2": "Rear Left Rotation Encoder",
+			"3": "Rear Right Rotation Encoder"
+		},
+		"CAN": {
+            "0": "Front Left Drive Motor",
+            "1": "Front Left Rotate Motor",
+            "2": "Front Right Drive Motor",
+            "3": "Front Right Rotate Motor",            
+            "4": "Rear Left Drive Motor",
+            "5": "Rear Left Rotate Motor",
+            "6": "Rear Right Drive Motor",
+            "7": "Rear Right Rotate Motor"            
+		},
+		"field": {
+			"w": 27,
+			"h": 27,
+			"px_per_ft": 10
+		}
+	}
+}

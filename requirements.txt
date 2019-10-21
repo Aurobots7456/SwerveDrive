@@ -1,0 +1,5 @@
+pynetworktables==2019.0.2
+pyfrc==2019.1.0
+robotpy_wpilib_utilities==2019.0.9
+wpilib==2019.2.3
+robotpy_ctre==2019.3.2
