@@ -55,7 +55,7 @@ class SwerveModule:
 
         # State variables
         self.allow_reverse = allow_reverse
-        self.debugging = self.sd.getAutoUpdateValue('drive/%s/debugging' % self.sd_prefix, True)
+        self.debugging = self.sd.getAutoUpdateValue('drive/%s/debugging' % self.sd_prefix, False)
 
         self.has_drive_encoder = has_drive_encoder
 
