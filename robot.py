@@ -28,6 +28,7 @@ class MyRobot(magicbot.MagicRobot):
         # Joysticks
         self.left_joystick = wpilib.Joystick(0)
         self.right_joystick = wpilib.Joystick(1)
+        self.gamempad = wpilib.Joystick(2)
 
         # VictorSPX Motor Controllers - Drive
         self.frontLeftMotor = ctre.WPI_VictorSPX(0)
@@ -85,10 +86,13 @@ class MyRobot(magicbot.MagicRobot):
 
     def teleopPeriodic(self):
         # Drive System
-        self.move(self.left_joystick.getY() * -1, self.left_joystick.getX() * -1, self.right_joystick.getX())
+        
+        self.move(self.gamempad.getRawAxis(5) * -1, self.gamempad.getRawAxis(4) * -1, self.gamempad.getRawAxis(0))
+
+        # self.move(self.left_joystick.getY() * -1, self.left_joystick.getX() * -1, self.right_joystick.getX())
         # self.move(self.left_joystick.getRawAxis(1) * -1, self.left_joystick.getRawAxis(0), self.left_joystick.getRawAxis(2) *- 1)
 
-        if self.left_joystick.getRawButton(2):
+        if self.gamempad.getRawButton(6):
             self.drive.request_wheel_lock = True
 
         if self.right_joystick.getRawButton(4):
