@@ -72,8 +72,8 @@ class SwerveDrive:
         self.threshold_input_vectors = True
 
         ####### CHANGE DIMENSIONS #######
-        self.width = (22 / 12) / 2 # (Inch / 12 = Foot) / 2
-        self.length = (18.5 / 12) / 2 # (Inch / 12 = Foot) / 2
+        self.width = (31.5 / 12) / 2 # (Inch / 12 = Foot) / 2
+        self.length = (32.5 / 12) / 2 # (Inch / 12 = Foot) / 2
 
         self.request_wheel_lock = False
 
