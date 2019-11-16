@@ -50,10 +50,10 @@ class MyRobot(magicbot.MagicRobot):
 
         ####### CHANGE ZEROs and INVERTED #######
         # Drive Modules
-        self.frontLeftModule = swervemodule.SwerveModule(self.frontLeftMotor, self.frontLeftRotate, self.frontLeftEnc, sd_prefix='FrontLeft_Module', zero=0.0, inverted=False)
-        self.frontRightModule = swervemodule.SwerveModule(self.frontRightMotor, self.frontRightRotate, self.frontRightEnc, sd_prefix='FrontRight_Module', zero=0.0, inverted=False)
-        self.rearLeftModule = swervemodule.SwerveModule(self.rearLeftMotor, self.rearLeftRotate, self.rearLeftEnc, sd_prefix='RearLeft_Module', zero=0.0, inverted=False)
-        self.rearRightModule = swervemodule.SwerveModule(self.rearRightMotor, self.rearRightRotate, self.rearRightEnc, sd_prefix='RearRight_Module', zero=0.0, inverted=False)
+        self.frontLeftModule = swervemodule.SwerveModule(self.frontLeftMotor, self.frontLeftRotate, self.frontLeftEnc, sd_prefix='FrontLeft_Module', zero=0.49, inverted=False)
+        self.frontRightModule = swervemodule.SwerveModule(self.frontRightMotor, self.frontRightRotate, self.frontRightEnc, sd_prefix='FrontRight_Module', zero=0.87, inverted=False)
+        self.rearLeftModule = swervemodule.SwerveModule(self.rearLeftMotor, self.rearLeftRotate, self.rearLeftEnc, sd_prefix='RearLeft_Module', zero=4.68, inverted=False)
+        self.rearRightModule = swervemodule.SwerveModule(self.rearRightMotor, self.rearRightRotate, self.rearRightEnc, sd_prefix='RearRight_Module', zero=4.43, inverted=False)
 
     def robotInit(self):
         super().robotInit()
@@ -95,16 +95,21 @@ class MyRobot(magicbot.MagicRobot):
         if self.gamempad.getRawButton(6):
             self.drive.request_wheel_lock = True
 
-        if self.right_joystick.getRawButton(4):
+        if self.gamempad.getRawButton(3):
             self.drive.set_raw_strafe(0.25)
-        elif self.right_joystick.getRawButton(5):
+        elif self.gamempad.getRawButton(2):
             self.drive.set_raw_strafe(-0.25)
-        if self.right_joystick.getRawButton(3):
+        if self.gamempad.getRawButton(4):
             self.drive.set_raw_fwd(0.35)
-        elif self.right_joystick.getRawButton(2):
+        elif self.gamempad.getRawButton(1):
             self.drive.set_raw_fwd(-0.35)
 
         self.update_sd()
+
+        self.sd.putNumber('enc0', self.frontLeftEnc.getVoltage())
+        self.sd.putNumber('enc1', self.frontRightEnc.getVoltage())
+        self.sd.putNumber('enc2', self.rearLeftEnc.getVoltage())
+        self.sd.putNumber('enc3', self.rearRightEnc.getVoltage())
 
     def update_sd(self):
         self.drive.update_smartdash()
