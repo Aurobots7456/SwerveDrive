@@ -8,6 +8,7 @@ from magicbot.magic_tunable import tunable
 import ctre
 
 from robotpy_ext.control.button_debouncer import ButtonDebouncer
+from robotpy_ext.autonomous.selector import AutonomousModeSelector
 
 from networktables import NetworkTables
 from networktables.util import ntproperty
@@ -48,7 +49,6 @@ class MyRobot(magicbot.MagicRobot):
         self.rearLeftEnc = wpilib.AnalogInput(2)
         self.rearRightEnc = wpilib.AnalogInput(3)
 
-        ####### CHANGE ZEROs and INVERTED #######
         # Drive Modules
         self.frontLeftModule = swervemodule.SwerveModule(self.frontLeftMotor, self.frontLeftRotate, self.frontLeftEnc, sd_prefix='FrontLeft_Module', zero=0.49, inverted=False)
         self.frontRightModule = swervemodule.SwerveModule(self.frontRightMotor, self.frontRightRotate, self.frontRightEnc, sd_prefix='FrontRight_Module', zero=0.87, inverted=False)
@@ -62,14 +62,14 @@ class MyRobot(magicbot.MagicRobot):
         self.update_sd()
 
     def disabledInit(self):
-        """
-        Empty
-        """
+        pass
 
     def autonomous(self):
-        """
-        Empty
-        """
+        self.drive.allow_reverse = False
+        self.drive.wait_for_align = True
+        self.drive.threshold_input_vectors = True
+
+        super().autonomous()
 
     def teleopInit(self):
         self.drive.flush()
@@ -90,7 +90,7 @@ class MyRobot(magicbot.MagicRobot):
         self.move(self.gamempad.getRawAxis(5) * -1, self.gamempad.getRawAxis(4) * -1, self.gamempad.getRawAxis(0))
 
         # self.move(self.left_joystick.getY() * -1, self.left_joystick.getX() * -1, self.right_joystick.getX())
-        # self.move(self.left_joystick.getRawAxis(1) * -1, self.left_joystick.getRawAxis(0), self.left_joystick.getRawAxis(2) *- 1)
+        # self.move(self.left_joystick.getRawAxis(1) * -1, self.left_joystick.getRawAxis(0), self.left_joystick.getRawAxis(2) * -1 )
 
         if self.gamempad.getRawButton(6):
             self.drive.request_wheel_lock = True
@@ -105,11 +105,6 @@ class MyRobot(magicbot.MagicRobot):
             self.drive.set_raw_fwd(-0.35)
 
         self.update_sd()
-
-        self.sd.putNumber('enc0', self.frontLeftEnc.getVoltage())
-        self.sd.putNumber('enc1', self.frontRightEnc.getVoltage())
-        self.sd.putNumber('enc2', self.rearLeftEnc.getVoltage())
-        self.sd.putNumber('enc3', self.rearRightEnc.getVoltage())
 
     def update_sd(self):
         self.drive.update_smartdash()
