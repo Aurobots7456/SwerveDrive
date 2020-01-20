@@ -102,9 +102,11 @@ class MyRobot(magicbot.MagicRobot):
         else:
             self.shooter.stop()
 
+        # Lock Drivetrain
         if self.gamempad.getRawButton(6):
             self.drive.request_wheel_lock = True
 
+        # Vectoral Button Drive
         if self.gamempad.getRawButton(3):
             self.drive.set_raw_strafe(0.25)
         elif self.gamempad.getRawButton(2):
