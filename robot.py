@@ -13,11 +13,12 @@ from robotpy_ext.autonomous.selector import AutonomousModeSelector
 from networktables import NetworkTables
 from networktables.util import ntproperty
 
-from components import swervemodule, swervedrive
+from components import swervemodule, swervedrive, shooter
 
 class MyRobot(magicbot.MagicRobot):
 
     drive = swervedrive.SwerveDrive
+    shooter = shooter.Shooter
 
     def createObjects(self):
         """
@@ -55,6 +56,10 @@ class MyRobot(magicbot.MagicRobot):
         self.rearLeftModule = swervemodule.SwerveModule(self.rearLeftMotor, self.rearLeftRotate, self.rearLeftEnc, sd_prefix='RearLeft_Module', zero=4.68, inverted=False)
         self.rearRightModule = swervemodule.SwerveModule(self.rearRightMotor, self.rearRightRotate, self.rearRightEnc, sd_prefix='RearRight_Module', zero=4.43, inverted=False)
 
+        # Shooter Motors
+        self.shooter.shooterMotor = ctre.WPI_VictorSPX(8)
+        self.shooter.beltMotor = ctre.WPI_VictorSPX(9)
+
     def robotInit(self):
         super().robotInit()
 
@@ -86,11 +91,16 @@ class MyRobot(magicbot.MagicRobot):
 
     def teleopPeriodic(self):
         # Drive System
-        
         self.move(self.gamempad.getRawAxis(5) * -1, self.gamempad.getRawAxis(4) * -1, self.gamempad.getRawAxis(0))
 
         # self.move(self.left_joystick.getY() * -1, self.left_joystick.getX() * -1, self.right_joystick.getX())
         # self.move(self.left_joystick.getRawAxis(1) * -1, self.left_joystick.getRawAxis(0), self.left_joystick.getRawAxis(2) * -1 )
+
+        # Shooter
+        if self.gamempad.getRawButton(5):
+            self.shooter.shoot()
+        else:
+            self.shooter.stop()
 
         if self.gamempad.getRawButton(6):
             self.drive.request_wheel_lock = True
