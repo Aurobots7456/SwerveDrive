@@ -13,12 +13,12 @@ class SwerveDrive:
 
     ####### CHANGE THESE CONSTANTS #######
     snap_rotation_axes = ntproperty('/SmartDashboard/drive/drive/snap_rotation_axes', 8)
-    lower_input_thresh = ntproperty('/SmartDashboard/drive/drive/lower_input_thresh', 0.06)
+    lower_input_thresh = ntproperty('/SmartDashboard/drive/drive/lower_input_thresh', 0.1)
 
     rotation_multiplier = ntproperty('/SmartDashboard/drive/drive/rotation_multiplier', 0.5)
     xy_multiplier = ntproperty('/SmartDashboard/drive/drive/xy_multiplier', 0.85)
 
-    debugging = ntproperty('/SmartDashboard/drive/drive/debugging', False)
+    debugging = ntproperty('/SmartDashboard/drive/drive/debugging', True)
 
     def setup(self):
         """
