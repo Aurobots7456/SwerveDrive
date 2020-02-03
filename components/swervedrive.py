@@ -72,8 +72,8 @@ class SwerveDrive:
         self.threshold_input_vectors = True
 
         ####### CHANGE DIMENSIONS #######
-        self.width = (31.5 / 12) / 2 # (Inch / 12 = Foot) / 2
-        self.length = (32.5 / 12) / 2 # (Inch / 12 = Foot) / 2
+        self.width = (23 / 12) / 2 # (Inch / 12 = Foot) / 2
+        self.length = (24 / 12) / 2 # (Inch / 12 = Foot) / 2
 
         self.request_wheel_lock = False
 
@@ -265,8 +265,8 @@ class SwerveDrive:
         ratio = math.hypot(self.length, self.width)
 
         # Velocities per quadrant
-        frontX = self._requested_vectors['strafe'] + (self._requested_vectors['rcw'] * (self.length / ratio))
-        rearX = self._requested_vectors['strafe'] - (self._requested_vectors['rcw'] * (self.length / ratio))
+        frontX = self._requested_vectors['strafe'] - (self._requested_vectors['rcw'] * (self.length / ratio))
+        rearX = self._requested_vectors['strafe'] + (self._requested_vectors['rcw'] * (self.length / ratio))
         leftY = self._requested_vectors['fwd'] - (self._requested_vectors['rcw'] * (self.width / ratio))
         rightY = self._requested_vectors['fwd'] + (self._requested_vectors['rcw'] * (self.width / ratio))
 
