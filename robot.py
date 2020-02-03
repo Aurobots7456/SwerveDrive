@@ -51,10 +51,10 @@ class MyRobot(magicbot.MagicRobot):
         self.rearRightEnc = wpilib.AnalogInput(3)
 
         # Drive Modules
-        self.frontLeftModule = swervemodule.SwerveModule(self.frontLeftMotor, self.frontLeftRotate, self.frontLeftEnc, sd_prefix='FrontLeft_Module', zero=4.8, inverted=True)
-        self.frontRightModule = swervemodule.SwerveModule(self.frontRightMotor, self.frontRightRotate, self.frontRightEnc, sd_prefix='FrontRight_Module', zero=1.65, inverted=False)
-        self.rearLeftModule = swervemodule.SwerveModule(self.rearLeftMotor, self.rearLeftRotate, self.rearLeftEnc, sd_prefix='RearLeft_Module', zero=0.13, inverted=True)
-        self.rearRightModule = swervemodule.SwerveModule(self.rearRightMotor, self.rearRightRotate, self.rearRightEnc, sd_prefix='RearRight_Module', zero=4, inverted=False)
+        self.frontLeftModule = swervemodule.SwerveModule(self.frontLeftMotor, self.frontLeftRotate, self.frontLeftEnc, sd_prefix='FrontLeft_Module', zero=2.25, inverted=False)
+        self.frontRightModule = swervemodule.SwerveModule(self.frontRightMotor, self.frontRightRotate, self.frontRightEnc, sd_prefix='FrontRight_Module', zero=4.2, inverted=True)
+        self.rearLeftModule = swervemodule.SwerveModule(self.rearLeftMotor, self.rearLeftRotate, self.rearLeftEnc, sd_prefix='RearLeft_Module', zero=2.69, inverted=False)
+        self.rearRightModule = swervemodule.SwerveModule(self.rearRightMotor, self.rearRightRotate, self.rearRightEnc, sd_prefix='RearRight_Module', zero=1.44, inverted=True)
 
         # Shooter Motors
         self.shooter.shooterMotor = ctre.WPI_VictorSPX(8)
