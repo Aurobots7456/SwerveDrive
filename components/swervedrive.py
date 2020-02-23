@@ -1,17 +1,17 @@
 import math
 
-from . import swervemodule
+from magicbot import magiccomponent
+from components import swervemodule
 
 from networktables import NetworkTables
 from networktables.util import ntproperty
 
 class SwerveDrive:
-    frontLeftModule = swervemodule.SwerveModule
-    frontRightModule = swervemodule.SwerveModule
-    rearLeftModule = swervemodule.SwerveModule
-    rearRightModule = swervemodule.SwerveModule
+    frontLeftModule: swervemodule.SwerveModule
+    frontRightModule: swervemodule.SwerveModule
+    rearLeftModule: swervemodule.SwerveModule
+    rearRightModule: swervemodule.SwerveModule
 
-    ####### CHANGE THESE CONSTANTS #######
     snap_rotation_axes = ntproperty('/SmartDashboard/drive/drive/snap_rotation_axes', 8)
     lower_input_thresh = ntproperty('/SmartDashboard/drive/drive/lower_input_thresh', 0.1)
 
@@ -71,7 +71,6 @@ class SwerveDrive:
         self.wait_for_align = False
         self.threshold_input_vectors = True
 
-        ####### CHANGE DIMENSIONS #######
         self.width = (23 / 12) / 2 # (Inch / 12 = Foot) / 2
         self.length = (24 / 12) / 2 # (Inch / 12 = Foot) / 2
 
