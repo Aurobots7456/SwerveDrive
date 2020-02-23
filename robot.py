@@ -12,7 +12,7 @@ from robotpy_ext.autonomous.selector import AutonomousModeSelector
 from networktables import NetworkTables
 from networktables.util import ntproperty
 
-from rev.color import ColorSensorV3
+from rev.color import ColorSensorV3, ColorMatch
 
 from components import swervedrive, swervemodule
 
@@ -40,16 +40,16 @@ class MyRobot(MagicRobot):
         self.gamempad = wpilib.Joystick(0)
 
         # Drive Motors
-        self.frontLeftModule_driveMotor = ctre.WPI_VictorSPX(0)
-        self.frontRightModule_driveMotor = ctre.WPI_VictorSPX(1)
-        self.rearLeftModule_driveMotor = ctre.WPI_VictorSPX(2)
-        self.rearRightModule_driveMotor = ctre.WPI_VictorSPX(3)
+        self.frontLeftModule_driveMotor = ctre.WPI_VictorSPX(5)
+        self.frontRightModule_driveMotor = ctre.WPI_VictorSPX(8)
+        self.rearLeftModule_driveMotor = ctre.WPI_VictorSPX(4)
+        self.rearRightModule_driveMotor = ctre.WPI_VictorSPX(9)
 
         # Rotate Motors
-        self.frontLeftModule_rotateMotor = ctre.WPI_VictorSPX(4)
-        self.frontRightModule_rotateMotor = ctre.WPI_VictorSPX(5)
-        self.rearLeftModule_rotateMotor = ctre.WPI_VictorSPX(6)
-        self.rearRightModule_rotateMotor = ctre.WPI_VictorSPX(7)
+        self.frontLeftModule_rotateMotor = ctre.WPI_VictorSPX(3)
+        self.frontRightModule_rotateMotor = ctre.WPI_VictorSPX(14)
+        self.rearLeftModule_rotateMotor = ctre.WPI_VictorSPX(2)
+        self.rearRightModule_rotateMotor = ctre.WPI_VictorSPX(15)
 
         # Encoders
         self.frontLeftModule_encoder = wpilib.AnalogInput(0)
@@ -58,20 +58,31 @@ class MyRobot(MagicRobot):
         self.rearRightModule_encoder = wpilib.AnalogInput(3)
 
         # Shooter
-        self.leftShooterMotor = ctre.WPI_VictorSPX(8)
-        self.rightShooterMotor = ctre.WPI_VictorSPX(9)
-        self.beltMotor = ctre.WPI_VictorSPX(10)
+        self.leftShooterMotor = ctre.WPI_VictorSPX(22)
+        self.rightShooterMotor = ctre.WPI_VictorSPX(21)
+        self.beltMotor = ctre.WPI_VictorSPX(20)
         self.intakeMotor = ctre.WPI_VictorSPX(11)
 
         # Wheel of Fortune
-        self.wofMotor = ctre.WPI_VictorSPX(12)
+        self.wofMotor = ctre.WPI_VictorSPX(23)
 
         # Climber
-        self.climbingMotor = ctre.WPI_VictorSPX(13)
-        self.hookMotor = ctre.WPI_VictorSPX(14)
+        self.climbingMotor = ctre.WPI_VictorSPX(10)
+        self.hookMotor = ctre.WPI_VictorSPX(24)
 
         # Color Sensor
         self.colorSensor = ColorSensorV3(wpilib.I2C.Port.kOnboard)
+        self.colorMatcher = ColorMatch()
+
+        self.kBlue = wpilib.Color(0.143, 0.427, 0.429)
+        self.kGreen = wpilib.Color(0.197, 0.561, 0.240)
+        self.kRed = wpilib.Color(0.561, 0.232, 0.114)
+        self.kYellow = wpilib.Color(0.361, 0.524, 0.113)
+
+        self.colorMatcher.addColorMatch(self.kBlue)
+        self.colorMatcher.addColorMatch(self.kGreen)
+        self.colorMatcher.addColorMatch(self.kRed)
+        self.colorMatcher.addColorMatch(self.kYellow)
 
     def disabledPeriodic(self):
         self.update_sd()
@@ -117,21 +128,32 @@ class MyRobot(MagicRobot):
 
         # Intake & Belt
         if self.gamempad.getRawButton(6):
-            self.intakeMotor.set(1)
-            self.beltMotor.set(1)
+            self.climbingMotor.set(1)
         else:
-            self.intakeMotor.set(0)
-            self.beltMotor.set(0)
+            self.climbingMotor.set(0)
 
         # Shooter
-        self.leftShooterMotor(self.gamempad.getRawAxis(3))
-        self.rightShooterMotor(self.gamempad.getRawAxis(3))
+        self.leftShooterMotor.set(self.gamempad.getRawAxis(3))
+        self.rightShooterMotor.set(self.gamempad.getRawAxis(3))
 
         # Color Sensor
         self.color = self.colorSensor.getColor()
         self.ir = self.colorSensor.getIR()
 
-        self.update_sd()
+        self.sd.putNumber('color_blue', self.color.blue)
+        self.sd.putNumber('color_green', self.color.green)
+        self.sd.putNumber('color_red', self.color.red)
+
+        self.match = self.colorMatcher.matchClosestColor(self.color, 0.5)
+        # self.sd.putNumber('color_match', self.match)
+        if (self.match == self.kBlue):
+            self.sd.putString('color_match', 'Blue')
+        elif (self.match == self.kGreen):
+            self.sd.putString('color_match', 'Green')
+        elif (self.match == self.kRed):
+            self.sd.putString('color_match', 'Red')
+        elif (self.match == self.kYellow):
+            self.sd.putString('color_match', 'Yellow')
 
     def update_sd(self):
         self.drive.update_smartdash()
