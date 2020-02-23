@@ -9,14 +9,14 @@ class BaseAuto(AutonomousStateMachine):
     Flushing the drive system reduces potential errrors.
     """
 
-    drive = swervedrive.SwerveDrive
+    drive: swervedrive.SwerveDrive
 
     @state
     def failed(self):
         """
         This state should only be called when an auto mode has failed.
         """
-        self.drive.debug(debug_modules=True) # Prints debugging info
+        self.drive.debug(debug_modules=True)
         self.next_state('finish')
 
     @state
