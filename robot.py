@@ -29,10 +29,10 @@ class MyRobot(MagicRobot):
     rearLeftModule: swervemodule.SwerveModule
     rearRightModule: swervemodule.SwerveModule
 
-    frontLeftModule_cfg = ModuleConfig(sd_prefix='FrontLeft_Module', zero=0, inverted=False, allow_reverse=True)
-    frontRightModule_cfg = ModuleConfig(sd_prefix='FrontRight_Module', zero=0, inverted=False, allow_reverse=True)
-    rearLeftModule_cfg = ModuleConfig(sd_prefix='RearLeft_Module', zero=0, inverted=False, allow_reverse=True)
-    rearRightModule_cfg = ModuleConfig(sd_prefix='RearRight_Module', zero=0, inverted=False, allow_reverse=True)
+    frontLeftModule_cfg = ModuleConfig(sd_prefix='FrontLeft_Module', zero=2.94, inverted=True, allow_reverse=True)
+    frontRightModule_cfg = ModuleConfig(sd_prefix='FrontRight_Module', zero=2.7, inverted=False, allow_reverse=True)
+    rearLeftModule_cfg = ModuleConfig(sd_prefix='RearLeft_Module', zero=0.22, inverted=True, allow_reverse=True)
+    rearRightModule_cfg = ModuleConfig(sd_prefix='RearRight_Module', zero=4.76, inverted=False, allow_reverse=True)
 
     shooter_leftShooterMotor: ctre.WPI_VictorSPX
     shooter_rightShooterMotor: ctre.WPI_VictorSPX
@@ -60,22 +60,22 @@ class MyRobot(MagicRobot):
 
         # Encoders
         self.frontLeftModule_encoder = wpilib.AnalogInput(0)
-        self.frontRightModule_encoder = wpilib.AnalogInput(1)
-        self.rearLeftModule_encoder = wpilib.AnalogInput(2)
-        self.rearRightModule_encoder = wpilib.AnalogInput(3)
+        self.frontRightModule_encoder = wpilib.AnalogInput(3)
+        self.rearLeftModule_encoder = wpilib.AnalogInput(1)
+        self.rearRightModule_encoder = wpilib.AnalogInput(2)
 
         # Shooter
-        self.shooter_leftShooterMotor = ctre.WPI_VictorSPX(22)
-        self.shooter_rightShooterMotor = ctre.WPI_VictorSPX(21)
-        self.shooter_beltMotor = ctre.WPI_VictorSPX(20)
-        self.shooter_intakeMotor = ctre.WPI_VictorSPX(11)
+        self.shooter_leftShooterMotor = ctre.WPI_VictorSPX(6)
+        self.shooter_rightShooterMotor = ctre.WPI_VictorSPX(7)
+        self.shooter_beltMotor = ctre.WPI_VictorSPX(11)
+        self.shooter_intakeMotor = ctre.WPI_VictorSPX(0)
 
         # Wheel of Fortune
-        self.wofMotor = ctre.WPI_VictorSPX(23)
+        self.wofMotor = ctre.WPI_VictorSPX(13)
 
         # Climber
         self.climbingMotor = ctre.WPI_VictorSPX(10)
-        self.hookMotor = ctre.WPI_VictorSPX(24)
+        self.hookMotor = ctre.WPI_VictorSPX(1)
 
         # Color Sensor
         self.colorSensor = color_sensor.REVColorSensor()
@@ -106,7 +106,7 @@ class MyRobot(MagicRobot):
 
     def teleopPeriodic(self):
         # Drive
-        self.move(self.gamempad.getRawAxis(5) * -1, self.gamempad.getRawAxis(2) * -1, self.gamempad.getRawAxis(0))
+        self.move(self.gamempad.getRawAxis(5) * -1, self.gamempad.getRawAxis(4) * -1, self.gamempad.getRawAxis(0))
 
         # Lock
         if self.gamempad.getRawButton(10):
@@ -123,18 +123,18 @@ class MyRobot(MagicRobot):
             self.drive.set_raw_fwd(-0.35)
 
         # Climber
-        if self.gamempad.getRawButton(6):
+        if self.gamempad.getRawButton(3):
             self.climbingMotor.set(1)
         else:
             self.climbingMotor.set(0)
 
         # Shooter
-        if self.gamempad.getRawAxis(6) > 0.1:
+        if self.gamempad.getRawAxis(3) > 0.1:
             self.shooter.shoot()
         else:
             self.shooter.stop()
 
-        self.shooter.intake(self.gamempad.getRawAxis(5))
+        self.shooter.intake(self.gamempad.getRawAxis(2))
 
         # Color Sensor
         self.color = self.colorSensor.getColor()
