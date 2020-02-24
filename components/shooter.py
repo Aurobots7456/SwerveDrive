@@ -1,17 +1,13 @@
 import wpilib
-
-try:
-    import ctre
-except ImportError:
-    ctre = None
+import ctre
 
 from magicbot import StateMachine, timed_state, state
 
 class Shooter(StateMachine):
-    leftShooterMotor: wpilib.PWMVictorSPX
-    rightShooterMotor: wpilib.PWMVictorSPX
-    beltMotor: wpilib.PWMVictorSPX
-    intakeMotor: wpilib.PWMVictorSPX
+    leftShooterMotor: ctre.WPI_VictorSPX
+    rightShooterMotor: ctre.WPI_VictorSPX
+    beltMotor: ctre.WPI_VictorSPX
+    intakeMotor: ctre.WPI_VictorSPX
 
     shooter_speed = 0
     intake_speed = 0
