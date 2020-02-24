@@ -14,13 +14,15 @@ from networktables.util import ntproperty
 
 from rev.color import ColorSensorV3, ColorMatch
 
-from components import swervedrive, swervemodule
+from components import swervedrive, swervemodule, shooter
+from common import color_sensor
 
 from collections import namedtuple
 ModuleConfig = swervemodule.ModuleConfig
 
 class MyRobot(MagicRobot):
     drive: swervedrive.SwerveDrive
+    shooter: shooter.Shooter
 
     frontLeftModule: swervemodule.SwerveModule
     frontRightModule: swervemodule.SwerveModule
@@ -31,6 +33,11 @@ class MyRobot(MagicRobot):
     frontRightModule_cfg = ModuleConfig(sd_prefix='FrontRight_Module', zero=0, inverted=False, allow_reverse=True)
     rearLeftModule_cfg = ModuleConfig(sd_prefix='RearLeft_Module', zero=0, inverted=False, allow_reverse=True)
     rearRightModule_cfg = ModuleConfig(sd_prefix='RearRight_Module', zero=0, inverted=False, allow_reverse=True)
+
+    shooter_leftShooterMotor: ctre.WPI_VictorSPX
+    shooter_rightShooterMotor: ctre.WPI_VictorSPX
+    shooter_intakeMotor: ctre.WPI_VictorSPX
+    shooter_beltMotor: ctre.WPI_VictorSPX
 
     def createObjects(self):
         # SmartDashboard
@@ -44,7 +51,7 @@ class MyRobot(MagicRobot):
         self.frontRightModule_driveMotor = ctre.WPI_VictorSPX(8)
         self.rearLeftModule_driveMotor = ctre.WPI_VictorSPX(4)
         self.rearRightModule_driveMotor = ctre.WPI_VictorSPX(9)
-
+        
         # Rotate Motors
         self.frontLeftModule_rotateMotor = ctre.WPI_VictorSPX(3)
         self.frontRightModule_rotateMotor = ctre.WPI_VictorSPX(14)
@@ -58,10 +65,10 @@ class MyRobot(MagicRobot):
         self.rearRightModule_encoder = wpilib.AnalogInput(3)
 
         # Shooter
-        self.leftShooterMotor = ctre.WPI_VictorSPX(22)
-        self.rightShooterMotor = ctre.WPI_VictorSPX(21)
-        self.beltMotor = ctre.WPI_VictorSPX(20)
-        self.intakeMotor = ctre.WPI_VictorSPX(11)
+        self.shooter_leftShooterMotor = ctre.WPI_VictorSPX(22)
+        self.shooter_rightShooterMotor = ctre.WPI_VictorSPX(21)
+        self.shooter_beltMotor = ctre.WPI_VictorSPX(20)
+        self.shooter_intakeMotor = ctre.WPI_VictorSPX(11)
 
         # Wheel of Fortune
         self.wofMotor = ctre.WPI_VictorSPX(23)
@@ -71,18 +78,7 @@ class MyRobot(MagicRobot):
         self.hookMotor = ctre.WPI_VictorSPX(24)
 
         # Color Sensor
-        self.colorSensor = ColorSensorV3(wpilib.I2C.Port.kOnboard)
-        self.colorMatcher = ColorMatch()
-
-        self.kBlue = wpilib.Color(0.143, 0.427, 0.429)
-        self.kGreen = wpilib.Color(0.197, 0.561, 0.240)
-        self.kRed = wpilib.Color(0.561, 0.232, 0.114)
-        self.kYellow = wpilib.Color(0.361, 0.524, 0.113)
-
-        self.colorMatcher.addColorMatch(self.kBlue)
-        self.colorMatcher.addColorMatch(self.kGreen)
-        self.colorMatcher.addColorMatch(self.kRed)
-        self.colorMatcher.addColorMatch(self.kYellow)
+        self.colorSensor = color_sensor.REVColorSensor()
 
     def disabledPeriodic(self):
         self.update_sd()
@@ -117,46 +113,35 @@ class MyRobot(MagicRobot):
             self.drive.request_wheel_lock = True
 
         # Vectoral Button Drive
-        if self.gamempad.getRawButton(3):
+        if self.gamempad.getPOV() == 0:
             self.drive.set_raw_strafe(0.25)
-        elif self.gamempad.getRawButton(2):
+        elif self.gamempad.getPOV() == 90:
             self.drive.set_raw_strafe(-0.25)
-        if self.gamempad.getRawButton(4):
+        elif self.gamempad.getPOV() == 180:
             self.drive.set_raw_fwd(0.35)
-        elif self.gamempad.getRawButton(1):
+        elif self.gamempad.getPOV() == 270:
             self.drive.set_raw_fwd(-0.35)
 
-        # Intake & Belt
+        # Climber
         if self.gamempad.getRawButton(6):
             self.climbingMotor.set(1)
         else:
             self.climbingMotor.set(0)
 
         # Shooter
-        self.leftShooterMotor.set(self.gamempad.getRawAxis(3))
-        self.rightShooterMotor.set(self.gamempad.getRawAxis(3))
+        if self.gamempad.getRawAxis(6) > 0.1:
+            self.shooter.shoot()
+        else:
+            self.shooter.stop()
+
+        self.shooter.intake(self.gamempad.getRawAxis(5))
 
         # Color Sensor
         self.color = self.colorSensor.getColor()
-        self.ir = self.colorSensor.getIR()
-
-        self.sd.putNumber('color_blue', self.color.blue)
-        self.sd.putNumber('color_green', self.color.green)
-        self.sd.putNumber('color_red', self.color.red)
-
-        self.match = self.colorMatcher.matchClosestColor(self.color, 0.5)
-        # self.sd.putNumber('color_match', self.match)
-        if (self.match == self.kBlue):
-            self.sd.putString('color_match', 'Blue')
-        elif (self.match == self.kGreen):
-            self.sd.putString('color_match', 'Green')
-        elif (self.match == self.kRed):
-            self.sd.putString('color_match', 'Red')
-        elif (self.match == self.kYellow):
-            self.sd.putString('color_match', 'Yellow')
 
     def update_sd(self):
         self.drive.update_smartdash()
+        self.colorSensor.matchColor()
 
 if __name__ == "__main__":
     wpilib.run(MyRobot)
