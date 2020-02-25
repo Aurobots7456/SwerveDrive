@@ -15,7 +15,7 @@ from networktables.util import ntproperty
 from rev.color import ColorSensorV3, ColorMatch
 
 from components import swervedrive, swervemodule, shooter
-from common import color_sensor
+from common import color_sensor, vision
 
 from collections import namedtuple
 ModuleConfig = swervemodule.ModuleConfig
@@ -80,6 +80,9 @@ class MyRobot(MagicRobot):
         # Color Sensor
         self.colorSensor = color_sensor.REVColorSensor()
 
+        # Vision
+        self.vision = vision.Vision()
+
     def disabledPeriodic(self):
         self.update_sd()
 
@@ -142,6 +145,7 @@ class MyRobot(MagicRobot):
     def update_sd(self):
         self.drive.update_smartdash()
         self.colorSensor.matchColor()
+        self.vision.updateTable()
 
 if __name__ == "__main__":
     wpilib.run(MyRobot)
