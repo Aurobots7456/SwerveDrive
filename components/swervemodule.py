@@ -143,7 +143,7 @@ class SwerveModule:
         """
 
         output = self._pid_controller.calculate(self.get_voltage(), self._requested_voltage)
-        clampedOutput = max(min(output, 1), 0)
+        clampedOutput = max(min(output, 1), -1)
         self.rotateMotor.set(clampedOutput)
 
         self.driveMotor.set(self._requested_speed)
