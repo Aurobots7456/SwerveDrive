@@ -321,10 +321,6 @@ class SwerveDrive:
         """
         self.update_smartdash()
 
-        if self.predict_position:
-            # self._predicted_position()
-            pass
-        
         self._calculate_vectors()
 
         for key in self.modules:

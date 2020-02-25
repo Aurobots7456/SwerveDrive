@@ -141,7 +141,6 @@ class SwerveModule:
 
         Should be called every robot iteration/loop.
         """
-        # self._pid_controller.setSetpoint(self._requested_voltage)
 
         output = self._pid_controller.calculate(self.get_voltage(), self._requested_voltage)
         clampedOutput = max(min(output, 1), 0)
@@ -149,7 +148,7 @@ class SwerveModule:
 
         self.driveMotor.set(self._requested_speed)
 
-        # self._requested_speed = 0.0
+        self._requested_speed = 0.0
 
         self.update_smartdash()
 
