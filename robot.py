@@ -71,7 +71,7 @@ class MyRobot(MagicRobot):
         self.shooter_intakeMotor = ctre.WPI_VictorSPX(0)
 
         # Wheel of Fortune
-        self.wofMotor = ctre.WPI_VictorSPX(13)
+        self.wof_motor = ctre.WPI_VictorSPX(13)
 
         # Climber
         self.climbingMotor = ctre.WPI_VictorSPX(10)
@@ -87,8 +87,6 @@ class MyRobot(MagicRobot):
         self.update_sd()
 
     def autonomousInit(self):
-        self.drive.allow_reverse = False
-        self.drive.wait_for_align = True
         self.drive.threshold_input_vectors = True
 
     def autonomous(self):
@@ -96,8 +94,6 @@ class MyRobot(MagicRobot):
 
     def teleopInit(self):
         self.drive.flush()
-        self.drive.allow_reverse = True
-        self.drive.wait_for_align = False
         self.drive.squared_input = True
         self.drive.threshold_input_vectors = True
 
@@ -117,13 +113,13 @@ class MyRobot(MagicRobot):
 
         # Vectoral Button Drive
         if self.gamempad.getPOV() == 0:
-            self.drive.set_raw_strafe(0.25)
+            self.drive.set_raw_fwd(0.25)
         elif self.gamempad.getPOV() == 90:
-            self.drive.set_raw_strafe(-0.25)
+            self.drive.set_raw_fwd(-0.25)
         elif self.gamempad.getPOV() == 180:
-            self.drive.set_raw_fwd(0.35)
+            self.drive.set_raw_strafe(0.35)
         elif self.gamempad.getPOV() == 270:
-            self.drive.set_raw_fwd(-0.35)
+            self.drive.set_raw_strafe(-0.35)
 
         # Climber
         if self.gamempad.getRawButton(3):
@@ -140,7 +136,7 @@ class MyRobot(MagicRobot):
         self.shooter.intake(self.gamempad.getRawAxis(2))
 
         # Color Sensor
-        self.color = self.colorSensor.getColor()
+        # self.color = self.colorSensor.getColor()
 
     def update_sd(self):
         self.drive.update_smartdash()
