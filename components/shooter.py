@@ -35,6 +35,10 @@ class Shooter(StateMachine):
         self.shooter_speed = 1
         self.belt_speed = 1
 
+    def unload(self):
+        self.shooter_speed = -1
+        self.belt_speed = -1
+
     def execute(self):
         super().execute()
 
