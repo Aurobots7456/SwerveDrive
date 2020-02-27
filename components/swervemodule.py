@@ -7,11 +7,13 @@ from networktables import NetworkTables
 from wpilib.controller import PIDController
 from collections import namedtuple
 
+# Create the structure of the config: SmartDashboard prefix, Encoder's zero point, Drive motor inverted, Allow reverse
 ModuleConfig = namedtuple('ModuleConfig', ['sd_prefix', 'zero', 'inverted', 'allow_reverse'])
 
-MAX_VOLTAGE = 5
+MAX_VOLTAGE = 5 # Absolute encoder measures from 0V to 5V
 
 class SwerveModule:
+    # Get the motors, encoder and config from injection
     driveMotor: ctre.WPI_VictorSPX
     rotateMotor: ctre.WPI_VictorSPX
         
@@ -22,7 +24,7 @@ class SwerveModule:
     def setup(self):
         # Config
         self.sd_prefix = self.cfg.sd_prefix or 'Module'
-        self.zero = self.cfg.zero or 0
+        self.encoder_zero = self.cfg.zero or 0
         self.inverted = self.cfg.inverted or False
         self.allow_reverse = self.cfg.allow_reverse or True
 
@@ -36,12 +38,11 @@ class SwerveModule:
         self._requested_voltage = 0
         self._requested_speed = 0
 
-        # Encoder
-        self.encoder_zero = self.zero
-
         # PID Controller
-        self._pid_controller = PIDController(1.5, 0.0, 0.0)
-        self._pid_controller.enableContinuousInput(0.0, 5.0)
+        self._pid_controller = PIDController(1.5, 0.0, 0.0) # Kp = 1.5, Ki = 0, Kd = 0
+        self._pid_controller.enableContinuousInput(0.0, 5.0) # Allow the motor to go from 360 to 0 degrees
+        self._pid_controller.setTolerance(0.05, 0.06) # 0.05 tolerance when calculating if it is aligned
+        self._pid_controller.reset()
 
     def set_pid(self, p, i, d):
         self._pid_controller.setPID(p, i, d)
@@ -58,6 +59,7 @@ class SwerveModule:
         """
         self._requested_voltage = self.encoder.getVoltage()
         self._requested_speed = 0
+        self._pid_controller.reset()
 
     @staticmethod
     def voltage_to_degrees(voltage):
@@ -101,7 +103,7 @@ class SwerveModule:
         """
         :return: Whether wheel is aligned to set point
         """
-        return abs(self._pid_controller.getError()) < 0.1
+        return abs(self._pid_controller.getPositionError()) < 0.21
 
     def _set_deg(self, value):
         """
@@ -142,13 +144,22 @@ class SwerveModule:
         Should be called every robot iteration/loop.
         """
 
-        output = self._pid_controller.calculate(self.get_voltage(), self._requested_voltage)
-        clampedOutput = max(min(output, 1), -1)
-        self.rotateMotor.set(clampedOutput)
+        error = self._pid_controller.calculate(self.get_voltage(), self._requested_voltage)
+        continiousError = self._pid_controller._getContinuousError(error)
 
+        if not self._pid_controller.atSetpoint():
+            output = max(min(continiousError, 1), -1)
+        else:
+            output = 0
+
+        self.rotateMotor.set(output)
         self.driveMotor.set(self._requested_speed)
 
         self._requested_speed = 0.0
+
+        error = 0
+        continiousError = 0
+        output = 0
 
         self.update_smartdash()
 
@@ -165,7 +176,8 @@ class SwerveModule:
             self.sd.putNumber('drive/%s/average voltage' % self.sd_prefix, self.encoder.getAverageVoltage())
             self.sd.putNumber('drive/%s/encoder_zero' % self.sd_prefix, self.encoder_zero)
 
-            self.sd.putNumber('drive/%s/PID' % self.sd_prefix, self._pid_controller.getSetpoint())
+            self.sd.putNumber('drive/%s/PID Setpoint' % self.sd_prefix, self._pid_controller.getSetpoint())
             self.sd.putNumber('drive/%s/PID Error' % self.sd_prefix, self._pid_controller.getPositionError())
+            self.sd.putNumber('drive/%s/PID isAligned' % self.sd_prefix, self.is_aligned())
 
             self.sd.putBoolean('drive/%s/allow_reverse' % self.sd_prefix, self.allow_reverse)
