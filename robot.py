@@ -29,10 +29,10 @@ class MyRobot(MagicRobot):
     rearLeftModule: swervemodule.SwerveModule
     rearRightModule: swervemodule.SwerveModule
 
-    frontLeftModule_cfg = ModuleConfig(sd_prefix='FrontLeft_Module', zero=2.94, inverted=True, allow_reverse=True)
-    frontRightModule_cfg = ModuleConfig(sd_prefix='FrontRight_Module', zero=2.7, inverted=False, allow_reverse=True)
-    rearLeftModule_cfg = ModuleConfig(sd_prefix='RearLeft_Module', zero=0.22, inverted=True, allow_reverse=True)
-    rearRightModule_cfg = ModuleConfig(sd_prefix='RearRight_Module', zero=4.76, inverted=False, allow_reverse=True)
+    frontLeftModule_cfg = ModuleConfig(sd_prefix='FrontLeft_Module', zero=0.24, inverted=False, allow_reverse=True)
+    frontRightModule_cfg = ModuleConfig(sd_prefix='FrontRight_Module', zero=0.12, inverted=True, allow_reverse=True)
+    rearLeftModule_cfg = ModuleConfig(sd_prefix='RearLeft_Module', zero=0.09, inverted=True, allow_reverse=True)
+    rearRightModule_cfg = ModuleConfig(sd_prefix='RearRight_Module', zero=1.13, inverted=True, allow_reverse=True)
 
     shooter_leftShooterMotor: ctre.WPI_VictorSPX
     shooter_rightShooterMotor: ctre.WPI_VictorSPX
@@ -83,10 +83,14 @@ class MyRobot(MagicRobot):
         # Vision
         self.vision = vision.Vision()
 
+        # Limit Switch
+        self.switch = wpilib.DigitalInput(0)
+
     def disabledPeriodic(self):
         self.update_sd()
 
     def autonomousInit(self):
+        self.drive.flush()
         self.drive.threshold_input_vectors = True
 
     def autonomous(self):
@@ -113,19 +117,28 @@ class MyRobot(MagicRobot):
 
         # Vectoral Button Drive
         if self.gamempad.getPOV() == 0:
-            self.drive.set_raw_fwd(0.25)
-        elif self.gamempad.getPOV() == 90:
-            self.drive.set_raw_fwd(-0.25)
+            self.drive.set_raw_fwd(0.5)
         elif self.gamempad.getPOV() == 180:
-            self.drive.set_raw_strafe(0.35)
+            self.drive.set_raw_fwd(-0.5)
+        elif self.gamempad.getPOV() == 90:
+            self.drive.set_raw_strafe(0.5)
         elif self.gamempad.getPOV() == 270:
-            self.drive.set_raw_strafe(-0.35)
+            self.drive.set_raw_strafe(-0.5)
 
         # Climber
         if self.gamempad.getRawButton(3):
+            self.climbingMotor.set(-1)
+        elif self.gamempad.getRawButton(4):
             self.climbingMotor.set(1)
         else:
             self.climbingMotor.set(0)
+
+        if self.gamempad.getRawButton(2):
+            self.hookMotor.set(1)
+        elif self.gamempad.getRawButton(1):
+            self.hookMotor.set(-1)
+        else:
+            self.hookMotor.set(0)
 
         # Shooter
         if self.gamempad.getRawAxis(3) > 0.1:

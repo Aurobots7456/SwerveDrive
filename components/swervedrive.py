@@ -59,7 +59,7 @@ class SwerveDrive:
         self.threshold_input_vectors = True
 
         self.width = (19.5 / 12) / 2 # (Inch / 12 = Foot) / 2
-        self.length = (25 / 12) / 2 # (Inch / 12 = Foot) / 2
+        self.length = (22 / 12) / 2 # (Inch / 12 = Foot) / 2
 
         self.request_wheel_lock = False
 
@@ -279,9 +279,6 @@ class SwerveDrive:
         """
         Prints debugging information to log
         """
-        if self.predict_position:
-            print('Position: ', self._predicted_position, '\n')
-
         if debug_modules:
             for key in self.modules:
                 self.modules[key].debug()
@@ -306,7 +303,7 @@ class SwerveDrive:
 
         for key in self.modules:
             self.modules[key].execute()
-
+        
     def update_smartdash(self):
         """
         Pushes some internal variables for debugging.

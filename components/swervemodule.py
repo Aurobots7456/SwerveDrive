@@ -39,10 +39,9 @@ class SwerveModule:
         self._requested_speed = 0
 
         # PID Controller
-        self._pid_controller = PIDController(1.5, 0.0, 0.0) # Kp = 1.5, Ki = 0, Kd = 0
-        self._pid_controller.enableContinuousInput(0.0, 5.0) # Allow the motor to go from 360 to 0 degrees
-        self._pid_controller.setTolerance(0.05, 0.06) # 0.05 tolerance when calculating if it is aligned
-        self._pid_controller.reset()
+        self._pid_controller = PIDController(1.5, 0.0, 0.0)
+        self._pid_controller.enableContinuousInput(0.0, 5.0)
+        self._pid_controller.setTolerance(0.05, 0.05)
 
     def set_pid(self, p, i, d):
         self._pid_controller.setPID(p, i, d)
@@ -57,7 +56,7 @@ class SwerveModule:
         """
         Flush the modules requested speed and voltage.
         """
-        self._requested_voltage = self.encoder.getVoltage()
+        self._requested_voltage = self.encoder_zero
         self._requested_speed = 0
         self._pid_controller.reset()
 
@@ -99,19 +98,13 @@ class SwerveModule:
         """
         self.encoder_zero = self.encoder.getVoltage()
 
-    def is_aligned(self):
-        """
-        :return: Whether wheel is aligned to set point
-        """
-        return abs(self._pid_controller.getPositionError()) < 0.21
-
     def _set_deg(self, value):
         """
         Round the value to within 360. Set the requested rotate position (requested voltage).
         Intended to be used only by the move function.
-        """
+        """     
         self._requested_voltage = ((self.degree_to_voltage(value) + self.encoder_zero) % 5)
-
+        
     def move(self, speed, deg):
         """
         Set the requested speed and rotation of passed.
@@ -143,23 +136,15 @@ class SwerveModule:
 
         Should be called every robot iteration/loop.
         """
-
-        error = self._pid_controller.calculate(self.get_voltage(), self._requested_voltage)
-        continiousError = self._pid_controller._getContinuousError(error)
-
-        if not self._pid_controller.atSetpoint():
-            output = max(min(continiousError, 1), -1)
-        else:
-            output = 0
-
-        self.rotateMotor.set(output)
         self.driveMotor.set(self._requested_speed)
+        error = self._pid_controller.calculate(self.get_voltage(), self._requested_voltage)
 
-        self._requested_speed = 0.0
-
-        error = 0
-        continiousError = 0
         output = 0
+        if not self._pid_controller.atSetpoint():
+            output = max(min(error, 0.5), -0.5)
+
+        self.sd.putNumber('drive/%s/output' % self.sd_prefix, output)
+        self.rotateMotor.set(output)
 
         self.update_smartdash()
 
@@ -178,6 +163,6 @@ class SwerveModule:
 
             self.sd.putNumber('drive/%s/PID Setpoint' % self.sd_prefix, self._pid_controller.getSetpoint())
             self.sd.putNumber('drive/%s/PID Error' % self.sd_prefix, self._pid_controller.getPositionError())
-            self.sd.putNumber('drive/%s/PID isAligned' % self.sd_prefix, self.is_aligned())
+            self.sd.putBoolean('drive/%s/PID isAligned' % self.sd_prefix, self._pid_controller.atSetpoint())
 
             self.sd.putBoolean('drive/%s/allow_reverse' % self.sd_prefix, self.allow_reverse)
