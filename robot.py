@@ -133,10 +133,11 @@ class MyRobot(MagicRobot):
         else:
             self.climbingMotor.set(0)
 
-        if self.gamempad.getRawButton(2):
-            self.hookMotor.set(1)
-        elif self.gamempad.getRawButton(1) and not self.switch.get():
+        # Hook
+        if self.gamempad.getRawButton(1) and not self.switch.get():
             self.hookMotor.set(-1)
+        elif self.gamempad.getRawButton(2):
+            self.hookMotor.set(1)
         else:
             self.hookMotor.set(0)
 
@@ -158,9 +159,6 @@ class MyRobot(MagicRobot):
             self.wof_motor.set(1)
         else:
             self.wof_motor.set(0)
-
-        # Color Sensor
-        # self.color = self.colorSensor.getColor()
 
         self.update_sd()
 

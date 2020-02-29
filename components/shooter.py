@@ -20,17 +20,22 @@ class Shooter(StateMachine):
 
         self.done()
 
-    def shoot(self):
-        self.engage()
+    def unload(self):
+        self.shooter_speed = -0.3
+        self.intake_speed = -0.5
+        self.belt_speed = -0.5
 
     def intake(self, speed):
         self.intake_speed = speed
 
-    @timed_state(duration=0.5, next_state="spinup")
+    def shoot(self):
+        self.engage()
+
+    @timed_state(duration=0.5, first=True, next_state="spinup")
     def adjust(self):
         self.unload()
 
-    @timed_state(duration=0.1, first=True, next_state="feedShooter")
+    @timed_state(duration=0.5, next_state="feedShooter")
     def spinup(self):
         self.shooter_speed = 0.8
 
@@ -38,10 +43,6 @@ class Shooter(StateMachine):
     def feedShooter(self):
         self.shooter_speed = 0.8
         self.belt_speed = 0.5
-
-    def unload(self):
-        self.shooter_speed = -0.3
-        self.belt_speed = -0.5
 
     def execute(self):
         super().execute()

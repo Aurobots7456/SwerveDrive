@@ -50,12 +50,9 @@ class Vision():
         Get the required vertical adjustment (drive) to align.
         :return: [-1, 1]
         '''
-        # current_distance = self.getDistance()
-        # error = self.KpVertical * (self.target_distance - current_distance)
         self.getValues()
 
         error = self.ty
-        print('Y: ', str(error))
         adjust = max(min(error, 1), -1)
         return adjust
 
@@ -67,7 +64,6 @@ class Vision():
         self.getValues()
 
         error = self.tx
-        print('X: ', str(error))
         adjust = max(min(error, 1), -1)
         return adjust
 
