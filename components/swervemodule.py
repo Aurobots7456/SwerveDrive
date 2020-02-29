@@ -136,15 +136,16 @@ class SwerveModule:
 
         Should be called every robot iteration/loop.
         """
-        self.driveMotor.set(self._requested_speed)
         error = self._pid_controller.calculate(self.get_voltage(), self._requested_voltage)
 
         output = 0
         if not self._pid_controller.atSetpoint():
-            output = max(min(error, 0.5), -0.5)
+            output = max(min(error, 1), -1)
 
         self.sd.putNumber('drive/%s/output' % self.sd_prefix, output)
         self.rotateMotor.set(output)
+
+        self.driveMotor.set(self._requested_speed)
 
         self.update_smartdash()
 

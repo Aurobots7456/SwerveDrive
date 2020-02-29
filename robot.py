@@ -117,13 +117,13 @@ class MyRobot(MagicRobot):
 
         # Vectoral Button Drive
         if self.gamempad.getPOV() == 0:
-            self.drive.set_raw_fwd(0.5)
+            self.drive.set_raw_fwd(0.35)
         elif self.gamempad.getPOV() == 180:
-            self.drive.set_raw_fwd(-0.5)
+            self.drive.set_raw_fwd(-0.35)
         elif self.gamempad.getPOV() == 90:
-            self.drive.set_raw_strafe(0.5)
+            self.drive.set_raw_strafe(-0.35)
         elif self.gamempad.getPOV() == 270:
-            self.drive.set_raw_strafe(-0.5)
+            self.drive.set_raw_strafe(0.35)
 
         # Climber
         if self.gamempad.getRawButton(3):
@@ -149,7 +149,7 @@ class MyRobot(MagicRobot):
             self.shooter.stop()
 
         if self.gamempad.getRawAxis(2) > 0.1:
-            self.shooter.intake(0.35)
+            self.shooter.intake(0.57)
         else:
             self.shooter.intake(0)
 

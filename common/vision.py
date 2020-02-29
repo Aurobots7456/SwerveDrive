@@ -8,14 +8,14 @@ class Vision():
 
     table = NetworkTables.getTable('limelight')
 
-    KpHorizontal = -0.1 # Proportional control constant for adjustment in horizontal
-    KpVertical = -0.1 # Proportional control constant for adjustment in vertical
+    KpHorizontal = -0.6 # Proportional control constant for adjustment in horizontal
+    KpVertical = -0.3 # Proportional control constant for adjustment in vertical
 
-    cam_height = 30 # Camera's height from the ground in cm
-    cam_angle = 45 # Camera's angle from the horizontal in degrees
+    cam_height = 38.5 # Camera's height from the ground in inches
+    cam_angle = 110 # Camera's angle from the horizontal in degrees
 
-    target_height = 249 # Target's mid-point's height from the ground in cm
-    target_distance = 30 # Desired distance from the wall to shoot
+    target_height = 98.25 # Target's mid-point's height from the ground in inches
+    target_distance = 120 # Desired distance from the wall to shoot
     
     tv = 0 # Whether the limelight has any valid targets
     tx = 0 # Horizontal offset from croshair to target in degrees
@@ -33,7 +33,7 @@ class Vision():
     def getDistance(self):
         '''
         Calculate the distance between the camera and the target wall.
-        :return: Distance in cm
+        :return: Distance in inch
         '''
         # https://docs.limelightvision.io/en/latest/cs_estimating_distance.html
         
@@ -50,8 +50,12 @@ class Vision():
         Get the required vertical adjustment (drive) to align.
         :return: [-1, 1]
         '''
-        current_distance = self.getDistance()
-        error = self.KpVertical * (self.target_distance - current_distance)
+        # current_distance = self.getDistance()
+        # error = self.KpVertical * (self.target_distance - current_distance)
+        self.getValues()
+
+        error = self.ty
+        print('Y: ', str(error))
         adjust = max(min(error, 1), -1)
         return adjust
 
@@ -62,11 +66,13 @@ class Vision():
         '''
         self.getValues()
 
-        error = self.KpHorizontal * self.tx
-        adjust = max(min(error, 1), 0)
+        error = self.tx
+        print('X: ', str(error))
+        adjust = max(min(error, 1), -1)
         return adjust
 
     def updateTable(self):
         self.table.putNumber('Rotate', self.horizontalAdjust())
         self.table.putNumber('Drive', self.verticalAdjust())
+        self.table.putNumber('Distance', self.getDistance())
 

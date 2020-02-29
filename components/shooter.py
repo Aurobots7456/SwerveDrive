@@ -30,18 +30,18 @@ class Shooter(StateMachine):
     def adjust(self):
         self.unload()
 
-    @timed_state(duration=1.0, first=True, next_state="feedShooter")
+    @timed_state(duration=0.1, first=True, next_state="feedShooter")
     def spinup(self):
-        self.shooter_speed = 0
+        self.shooter_speed = 0.8
 
     @state
     def feedShooter(self):
-        self.shooter_speed = 0
-        self.belt_speed = 0.35
+        self.shooter_speed = 0.8
+        self.belt_speed = 0.5
 
     def unload(self):
         self.shooter_speed = -0.3
-        self.belt_speed = -0.35
+        self.belt_speed = -0.5
 
     def execute(self):
         super().execute()
