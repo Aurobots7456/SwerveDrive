@@ -135,7 +135,7 @@ class MyRobot(MagicRobot):
 
         if self.gamempad.getRawButton(2):
             self.hookMotor.set(1)
-        elif self.gamempad.getRawButton(1):
+        elif self.gamempad.getRawButton(1) and not self.switch.get():
             self.hookMotor.set(-1)
         else:
             self.hookMotor.set(0)
@@ -143,13 +143,26 @@ class MyRobot(MagicRobot):
         # Shooter
         if self.gamempad.getRawAxis(3) > 0.1:
             self.shooter.shoot()
+        elif self.gamempad.getRawButton(6):
+            self.shooter.unload()
         else:
             self.shooter.stop()
 
-        self.shooter.intake(self.gamempad.getRawAxis(2))
+        if self.gamempad.getRawAxis(2) > 0.1:
+            self.shooter.intake(0.35)
+        else:
+            self.shooter.intake(0)
+
+        # WoF
+        if self.gamempad.getRawButton(5):
+            self.wof_motor.set(1)
+        else:
+            self.wof_motor.set(0)
 
         # Color Sensor
         # self.color = self.colorSensor.getColor()
+
+        self.update_sd()
 
     def update_sd(self):
         self.drive.update_smartdash()
