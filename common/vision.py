@@ -5,7 +5,6 @@ from components import swervedrive
 from networktables import NetworkTables
 
 class Vision():
-
     table = NetworkTables.getTable('limelight')
 
     KpHorizontal = -0.6 # Proportional control constant for adjustment in horizontal
@@ -20,6 +19,8 @@ class Vision():
     tv = 0 # Whether the limelight has any valid targets
     tx = 0 # Horizontal offset from croshair to target in degrees
     ty = 0 # Vertical offset from croshair to target in degress
+
+    debug = False
 
     def getValues(self):
         self.tv = self.table.getNumber('tv', 0)
@@ -68,7 +69,7 @@ class Vision():
         return adjust
 
     def updateTable(self):
-        self.table.putNumber('Rotate', self.horizontalAdjust())
-        self.table.putNumber('Drive', self.verticalAdjust())
-        self.table.putNumber('Distance', self.getDistance())
-
+        if self.debug:
+            self.table.putNumber('Rotate', self.horizontalAdjust())
+            self.table.putNumber('Drive', self.verticalAdjust())
+            self.table.putNumber('Distance', self.getDistance())
