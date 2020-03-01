@@ -127,7 +127,7 @@ class SwerveModule:
 
         Should be called every robot iteration/loop.
         """
-        error = self._pid_controller.calculate(self.get_voltage(), self._requested_voltage)
+        error = self._pid_controller.calculate(self.encoder.getVoltage(), self._requested_voltage)
 
         output = 0
         if not self._pid_controller.atSetpoint():
