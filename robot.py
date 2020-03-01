@@ -78,7 +78,7 @@ class MyRobot(MagicRobot):
         self.hookMotor = ctre.WPI_VictorSPX(1)
 
         # Color Sensor
-        self.colorSensor = color_sensor.REVColorSensor()
+        self.colorSensor = color_sensor.ColorSensor()
 
         # Vision
         self.vision = vision.Vision()

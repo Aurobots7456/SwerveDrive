@@ -2,7 +2,7 @@ from wpilib import I2C, Color
 from rev.color import ColorSensorV3, ColorMatch
 from networktables import NetworkTables
 
-class REVColorSensor():
+class ColorSensor():
     def __init__(self):
         self.sd = NetworkTables.getTable('SmartDashboard')
 
