@@ -86,6 +86,9 @@ class MyRobot(MagicRobot):
         # Limit Switch
         self.switch = wpilib.DigitalInput(0)
 
+        # PDP
+        self.pdp = wpilib.PowerDistributionPanel(0)
+
     def disabledPeriodic(self):
         self.update_sd()
 
@@ -163,6 +166,8 @@ class MyRobot(MagicRobot):
         self.update_sd()
 
     def update_sd(self):
+        self.sd.putNumber('Climb_Current_Draw', self.pdp.getCurrent(10))
+
         self.drive.update_smartdash()
         self.colorSensor.matchColor()
         self.vision.updateTable()
