@@ -43,9 +43,6 @@ class SwerveModule:
         self._pid_controller.enableContinuousInput(0.0, 5.0)
         self._pid_controller.setTolerance(0.05, 0.05)
 
-    def set_pid(self, p, i, d):
-        self._pid_controller.setPID(p, i, d)
-
     def get_voltage(self):
         """
         :return: the voltage position after the zero
@@ -91,12 +88,6 @@ class SwerveModule:
         :param degree: a degree value between 0 and 360
         """
         return (degree / 360) * 5
-
-    def zero_encoder(self):
-        """
-        Set the zero to the current voltage output.
-        """
-        self.encoder_zero = self.encoder.getVoltage()
 
     def _set_deg(self, value):
         """

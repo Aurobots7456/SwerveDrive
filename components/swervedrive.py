@@ -15,7 +15,6 @@ class SwerveDrive:
     lower_input_thresh = ntproperty('/SmartDashboard/drive/drive/lower_input_thresh', 0.1)
     rotation_multiplier = ntproperty('/SmartDashboard/drive/drive/rotation_multiplier', 0.5)
     xy_multiplier = ntproperty('/SmartDashboard/drive/drive/xy_multiplier', 0.65)
-
     debugging = ntproperty('/SmartDashboard/drive/drive/debugging', True)
 
     def setup(self):
@@ -41,15 +40,15 @@ class SwerveDrive:
         }
 
         self._requested_angles = {
-            'front_right': 0,
             'front_left': 0,
+            'front_right': 0,
             'rear_left': 0,
             'rear_right': 0
         }
 
         self._requested_speeds = {
-            'front_right': 0,
             'front_left': 0,
+            'front_right': 0,
             'rear_left': 0,
             'rear_right': 0
         }
@@ -312,6 +311,3 @@ class SwerveDrive:
             for key in self._requested_angles:
                 self.sd.putNumber('drive/drive/%s_angle' % key, self._requested_angles[key])
                 self.sd.putNumber('drive/drive/%s_speed' % key, self._requested_speeds[key])
-
-        for key in self.modules:
-            self.modules[key].update_smartdash()
