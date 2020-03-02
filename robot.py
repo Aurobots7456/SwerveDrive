@@ -131,9 +131,9 @@ class MyRobot(MagicRobot):
 
         # Climber
         if self.gamempad2.getRawButton(1):
-            self.climbingMotor.set(-1)
-        elif self.gamempad2.getRawButton(4):
             self.climbingMotor.set(1)
+        elif self.gamempad2.getRawButton(4):
+            self.climbingMotor.set(-1)
         else:
             self.climbingMotor.set(0)
 
