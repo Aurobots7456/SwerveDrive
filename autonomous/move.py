@@ -5,7 +5,7 @@ from common import vision
 
 from magicbot.state_machine import state, timed_state, AutonomousStateMachine
 
-class Middle(BaseAuto):
+class Default(BaseAuto):
     MODE_NAME = "Default"
     DEFAULT = True
 
@@ -13,7 +13,7 @@ class Middle(BaseAuto):
     shooter: shooter.Shooter
     vision = vision.Vision()
 
-    @state(first=True)
+    @timed_state(duration=10, first=True)
     def vision_align(self):
         drive = self.vision.verticalAdjust()
         rotate = self.vision.horizontalAdjust()
@@ -34,7 +34,7 @@ class Middle(BaseAuto):
     def shoot(self):
         self.shooter.shoot()
 
-class Left(BaseAuto):
+class OnlyMove(BaseAuto):
     MODE_NAME = "Only Move"
     DEFAULT = False
 
