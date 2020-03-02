@@ -45,6 +45,7 @@ class MyRobot(MagicRobot):
 
         # Gamepad
         self.gamempad = wpilib.Joystick(0)
+        self.gamempad2 = wpilib.Joystick(1)
 
         # Drive Motors
         self.frontLeftModule_driveMotor = ctre.WPI_VictorSPX(5)
@@ -115,7 +116,7 @@ class MyRobot(MagicRobot):
         self.move(self.gamempad.getRawAxis(5) * -1, self.gamempad.getRawAxis(4) * -1, self.gamempad.getRawAxis(0))
 
         # Lock
-        if self.gamempad.getRawButton(10):
+        if self.gamempad.getRawButton(1):
             self.drive.request_wheel_lock = True
 
         # Vectoral Button Drive
@@ -129,37 +130,39 @@ class MyRobot(MagicRobot):
             self.drive.set_raw_strafe(0.35)
 
         # Climber
-        if self.gamempad.getRawButton(3):
+        if self.gamempad2.getRawButton(1):
             self.climbingMotor.set(-1)
-        elif self.gamempad.getRawButton(4):
+        elif self.gamempad2.getRawButton(4):
             self.climbingMotor.set(1)
         else:
             self.climbingMotor.set(0)
 
         # Hook
-        if self.gamempad.getRawButton(1) and not self.switch.get():
-            self.hookMotor.set(-1)
-        elif self.gamempad.getRawButton(2):
-            self.hookMotor.set(1)
+        if self.gamempad2.getRawAxis(5) < 0 and not self.switch.get():
+            self.hookMotor.set(self.gamempad2.getRawAxis(5))
+        elif self.gamempad2.getRawAxis(5) > 0:
+            self.hookMotor.set(self.gamempad2.getRawAxis(5))
         else:
             self.hookMotor.set(0)
 
         # Shooter
-        if self.gamempad.getRawAxis(3) > 0.1:
+        if self.gamempad.getRawAxis(3) > 0:
             self.shooter.shoot()
-        elif self.gamempad.getRawButton(6):
+        elif self.gamempad.getRawButton(6) or self.gamempad2.getRawAxis(2) > 0:
             self.shooter.unload()
         else:
             self.shooter.stop()
 
-        if self.gamempad.getRawAxis(2) > 0.1:
+        if self.gamempad.getRawAxis(2) > 0 or self.gamempad2.getRawAxis(3) > 0:
             self.shooter.intake(0.57)
         else:
             self.shooter.intake(0)
 
         # WoF
-        if self.gamempad.getRawButton(5):
+        if self.gamempad2.getRawButton(5):
             self.wof_motor.set(1)
+        elif self.gamempad2.getRawButton(6):
+            self.wof_motor.set(-1)
         else:
             self.wof_motor.set(0)
 
