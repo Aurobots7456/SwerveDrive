@@ -29,10 +29,10 @@ class MyRobot(MagicRobot):
     rearLeftModule: swervemodule.SwerveModule
     rearRightModule: swervemodule.SwerveModule
 
-    frontLeftModule_cfg = ModuleConfig(sd_prefix='FrontLeft_Module', zero=0.24, inverted=False, allow_reverse=True)
-    frontRightModule_cfg = ModuleConfig(sd_prefix='FrontRight_Module', zero=0.12, inverted=True, allow_reverse=True)
-    rearLeftModule_cfg = ModuleConfig(sd_prefix='RearLeft_Module', zero=0.09, inverted=True, allow_reverse=True)
-    rearRightModule_cfg = ModuleConfig(sd_prefix='RearRight_Module', zero=1.13, inverted=True, allow_reverse=True)
+    frontLeftModule_cfg = ModuleConfig(sd_prefix='FrontLeft_Module', zero=2.97, inverted=True, allow_reverse=True)
+    frontRightModule_cfg = ModuleConfig(sd_prefix='FrontRight_Module', zero=2.69, inverted=False, allow_reverse=True)
+    rearLeftModule_cfg = ModuleConfig(sd_prefix='RearLeft_Module', zero=0.18, inverted=True, allow_reverse=True)
+    rearRightModule_cfg = ModuleConfig(sd_prefix='RearRight_Module', zero=4.76, inverted=False, allow_reverse=True)
 
     shooter_leftShooterMotor: ctre.WPI_VictorSPX
     shooter_rightShooterMotor: ctre.WPI_VictorSPX
