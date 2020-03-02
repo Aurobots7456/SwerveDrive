@@ -25,8 +25,9 @@ class Shooter(StateMachine):
         self.intake_speed = -0.5
         self.belt_speed = -0.5
 
-    def intake(self, speed):
-        self.intake_speed = speed
+    def intake(self):
+        self.intake_speed = 0.57
+        self.belt_speed = 0.5
 
     def shoot(self):
         self.engage()

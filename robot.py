@@ -148,15 +148,12 @@ class MyRobot(MagicRobot):
         # Shooter
         if self.gamempad.getRawAxis(3) > 0:
             self.shooter.shoot()
-        elif self.gamempad.getRawButton(6) or self.gamempad2.getRawAxis(2) > 0:
+        elif self.gamempad.getRawButton(5) or self.gamempad2.getRawAxis(2) > 0:
             self.shooter.unload()
+        elif self.gamempad.getRawAxis(2) > 0 or self.gamempad2.getRawAxis(3) > 0:
+            self.shooter.intake()
         else:
             self.shooter.stop()
-
-        if self.gamempad.getRawAxis(2) > 0 or self.gamempad2.getRawAxis(3) > 0:
-            self.shooter.intake(0.57)
-        else:
-            self.shooter.intake(0)
 
         # WoF
         if self.gamempad2.getRawButton(5):
