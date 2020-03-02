@@ -108,8 +108,8 @@ class MyRobot(MagicRobot):
         self.drive.threshold_input_vectors = True
 
     def move(self, x, y, rcw):
-        if self.gamempad.getRawButton(7): ## TODO: CHANGE THIS
-            rcw *= 0.75
+        if self.gamempad.getRawButton(3):
+            rcw *= 0.7
 
         self.drive.move(x, y, rcw)
 
