@@ -11,7 +11,7 @@ class Default(BaseAuto):
 
     drive: swervedrive.SwerveDrive
     shooter: shooter.Shooter
-    vision = vision.Vision()
+    vision: vision.Vision
 
     @timed_state(duration=10, first=True)
     def vision_align(self):

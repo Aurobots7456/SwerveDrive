@@ -39,6 +39,8 @@ class MyRobot(MagicRobot):
     shooter_intakeMotor: ctre.WPI_VictorSPX
     shooter_beltMotor: ctre.WPI_VictorSPX
 
+    vision: vision.Vision
+
     def createObjects(self):
         # SmartDashboard
         self.sd = NetworkTables.getTable('SmartDashboard')
@@ -148,6 +150,8 @@ class MyRobot(MagicRobot):
         # Shooter
         if self.gamempad.getRawAxis(3) > 0:
             self.shooter.shoot()
+        elif self.gamempad.getRawButton(6):
+            self.shooter.align()
         elif self.gamempad.getRawButton(5) or self.gamempad2.getRawAxis(2) > 0:
             self.shooter.unload()
         elif self.gamempad.getRawAxis(2) > 0 or self.gamempad2.getRawAxis(3) > 0:
