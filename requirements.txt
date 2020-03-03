@@ -22,6 +22,7 @@ robotpy-hal==2020.3.2.0
 robotpy-halsim-gui==2020.3.2.0
 robotpy-installer==2020.0.5
 robotpy-rev-color==2020.1.0.1
+robotpy-ctre==2020.3.0
 robotpy-wpilib-utilities==2020.1.4
 robotpy-wpiutil==2020.3.2.0
 six==1.14.0
