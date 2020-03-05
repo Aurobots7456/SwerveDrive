@@ -14,7 +14,7 @@ from networktables.util import ntproperty
 
 from rev.color import ColorSensorV3, ColorMatch
 
-from components import swervedrive, swervemodule, shooter
+from components import swervedrive, swervemodule, shooter, wof
 from common import color_sensor, vision
 
 from collections import namedtuple
@@ -23,6 +23,7 @@ ModuleConfig = swervemodule.ModuleConfig
 class MyRobot(MagicRobot):
     drive: swervedrive.SwerveDrive
     shooter: shooter.Shooter
+    wof: wof.WheelOfFortune
 
     frontLeftModule: swervemodule.SwerveModule
     frontRightModule: swervemodule.SwerveModule
@@ -40,6 +41,7 @@ class MyRobot(MagicRobot):
     shooter_beltMotor: ctre.WPI_VictorSPX
 
     vision: vision.Vision
+    colorSensor: color_sensor.ColorSensor
 
     def createObjects(self):
         # SmartDashboard
@@ -134,8 +136,6 @@ class MyRobot(MagicRobot):
         # Climber
         if self.gamempad2.getRawButton(1):
             self.climbingMotor.set(1)
-        elif self.gamempad2.getRawButton(4):
-            self.climbingMotor.set(-1)
         else:
             self.climbingMotor.set(0)
 
@@ -160,12 +160,18 @@ class MyRobot(MagicRobot):
             self.shooter.stop()
 
         # WoF
-        if self.gamempad2.getRawButton(5):
-            self.wof_motor.set(1)
+        if self.gamempad2.getRawButton(2):
+            self.wof.handleFirstStage()
+        elif self.gamempad2.getRawButton(3):
+            self.wof.handleSecondStage()
+        elif self.gamempad2.getRawButton(4):
+            self.wof.reset()
+        elif self.gamempad2.getRawButton(5):
+            self.wof.manualTurn(1)
         elif self.gamempad2.getRawButton(6):
-            self.wof_motor.set(-1)
+            self.wof.manualTurn(-1)
         else:
-            self.wof_motor.set(0)
+            self.wof.manualTurn(0)
 
         self.update_sd()
 
@@ -173,7 +179,8 @@ class MyRobot(MagicRobot):
         self.sd.putNumber('Climb_Current_Draw', self.pdp.getCurrent(10))
 
         self.drive.update_smartdash()
-        self.colorSensor.matchColor()
+        self.colorSensor.updateSD()
+        self.wof.updateSD()
         self.vision.updateTable()
 
 if __name__ == "__main__":
