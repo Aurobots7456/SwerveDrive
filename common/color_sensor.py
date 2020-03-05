@@ -28,12 +28,15 @@ class ColorSensor():
         # print(color)
 
         if (self.match == self.kBlue):
-            self.sd.putString('color_match', 'Blue')
+            return "B"
         elif (self.match == self.kGreen):
-            self.sd.putString('color_match', 'Green')
+            return "G"
         elif (self.match == self.kRed):
-            self.sd.putString('color_match', 'Red')
+            return "R"
         elif (self.match == self.kYellow):
-            self.sd.putString('color_match', 'Yellow')
+            return "Y"
         else:
-            self.sd.putString('color_match', 'None')
+            return "N"
+
+    def updateSD(self):
+        self.sd.putString("/wof/Color Match", self.matchColor())
