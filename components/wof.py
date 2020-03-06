@@ -6,7 +6,7 @@ from networktables import NetworkTables
 
 from common import color_sensor
 
-class WheelOfFortune(StateMachine):
+class WheelOfFortune():
     # Get the motors from the injection
     motor: ctre.WPI_VictorSPX
     colorSensor: color_sensor.ColorSensor
@@ -36,7 +36,7 @@ class WheelOfFortune(StateMachine):
         :return: First letter of the color (R / G / B / Y) or N for none.
         '''
         # Get the game specific message from the driver station
-        match_data = wpilib.DriverStation.getGameSpecificMessage()
+        match_data = wpilib.DriverStation.getGameSpecificMessage(wpilib.DriverStation.getInstance())
 
         if not match_data == "":
             # If data exist return the data
@@ -87,7 +87,7 @@ class WheelOfFortune(StateMachine):
 
         # Periodic
         if self.inProgress and not matched_color == "N":
-            if count < 8: # Until the count reaches 8 (3,5 turns to be safe)
+            if self.count < 8: # Until the count reaches 8 (3,5 turns to be safe)
                 if matched_color == self.next_color:
                     # If the next color is read reset isCounted back to false
                     self.isCounted = False
@@ -95,14 +95,14 @@ class WheelOfFortune(StateMachine):
                 if not self.isCounted:
                     # If it is not counted yet, count 1 when reached to the target color
                     if matched_color == self.target_color:
-                        count += 1
+                        self.count += 1
                         self.isCounted = True
 
                 self.motor.set(1)
             else:
                 # When reached the desired amount of turns stop and reset.
                 self.motor.set(0)
-                self.reset()
+                # self.reset()
 
     def handleSecondStage(self):
         '''
@@ -132,6 +132,9 @@ class WheelOfFortune(StateMachine):
                 else:
                     self.motor.set(0)
                     self.reset()
+
+    def execute(self):
+        return
 
     def updateSD(self):
         # Update the SmartDashboard
