@@ -117,7 +117,7 @@ class MyRobot(MagicRobot):
 
     def teleopPeriodic(self):
         # Drive
-        self.move(self.gamempad.getRawAxis(5) * -1, self.gamempad.getRawAxis(4) * -1, self.gamempad.getRawAxis(0))
+        self.move(self.gamempad.getRawAxis(5), self.gamempad.getRawAxis(4), self.gamempad.getRawAxis(0))
 
         # Lock
         if self.gamempad.getRawButton(1):
@@ -160,9 +160,9 @@ class MyRobot(MagicRobot):
             self.shooter.stop()
 
         # WoF
-        if self.gamempad2.getRawButton(2):
+        if self.gamempad2.getRawButton(3):
             self.wof.handleFirstStage()
-        elif self.gamempad2.getRawButton(3):
+        elif self.gamempad2.getRawButton(2):
             self.wof.handleSecondStage()
         elif self.gamempad2.getRawButton(4):
             self.wof.reset()
