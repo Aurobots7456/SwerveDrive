@@ -52,7 +52,7 @@ class Shooter(StateMachine):
     def shoot(self):
         self.engage()
 
-    @timed_state(duration=0.5, first=True, next_state="spinup")
+    @timed_state(duration=0.25, first=True, next_state="spinup")
     def adjust(self):
         self.unload()
 
