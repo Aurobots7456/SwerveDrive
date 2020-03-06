@@ -106,7 +106,7 @@ class MyRobot(MagicRobot):
 
     def teleopInit(self):
         self.drive.flush()
-        self.drive.squared_input = True
+        self.drive.squared_inputs = True
         self.drive.threshold_input_vectors = True
 
     def move(self, x, y, rcw):
