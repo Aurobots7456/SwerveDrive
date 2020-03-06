@@ -1,24 +1,21 @@
 import math
 
-from . import swervemodule
+from magicbot import magiccomponent
+from components import swervemodule
 
 from networktables import NetworkTables
 from networktables.util import ntproperty
 
 class SwerveDrive:
-    frontLeftModule = swervemodule.SwerveModule
-    frontRightModule = swervemodule.SwerveModule
-    rearLeftModule = swervemodule.SwerveModule
-    rearRightModule = swervemodule.SwerveModule
+    frontLeftModule: swervemodule.SwerveModule
+    frontRightModule: swervemodule.SwerveModule
+    rearLeftModule: swervemodule.SwerveModule
+    rearRightModule: swervemodule.SwerveModule
 
-    ####### CHANGE THESE CONSTANTS #######
-    snap_rotation_axes = ntproperty('/SmartDashboard/drive/drive/snap_rotation_axes', 8)
     lower_input_thresh = ntproperty('/SmartDashboard/drive/drive/lower_input_thresh', 0.1)
-
     rotation_multiplier = ntproperty('/SmartDashboard/drive/drive/rotation_multiplier', 0.5)
-    xy_multiplier = ntproperty('/SmartDashboard/drive/drive/xy_multiplier', 0.85)
-
-    debugging = ntproperty('/SmartDashboard/drive/drive/debugging', True)
+    xy_multiplier = ntproperty('/SmartDashboard/drive/drive/xy_multiplier', 0.65)
+    debugging = ntproperty('/SmartDashboard/drive/drive/debugging', False)
 
     def setup(self):
         """
@@ -43,37 +40,25 @@ class SwerveDrive:
         }
 
         self._requested_angles = {
-            'front_right': 0,
             'front_left': 0,
+            'front_right': 0,
             'rear_left': 0,
             'rear_right': 0
         }
 
         self._requested_speeds = {
-            'front_right': 0,
             'front_left': 0,
+            'front_right': 0,
             'rear_left': 0,
             'rear_right': 0
         }
 
-        self._predicted_position = {
-            'fwd': 0,
-            'strafe': 0,
-            'rcw': 0
-        }
-
-        self.predict_position = False
-
         # Variables that allow enabling and disabling of features in code
-        self.allow_reverse = False
         self.squared_inputs = True
-        self.snap_rotation = False
-        self.wait_for_align = False
         self.threshold_input_vectors = True
 
-        ####### CHANGE DIMENSIONS #######
-        self.width = (23 / 12) / 2 # (Inch / 12 = Foot) / 2
-        self.length = (24 / 12) / 2 # (Inch / 12 = Foot) / 2
+        self.width = (19.5 / 12) / 2 # (Inch / 12 = Foot) / 2
+        self.length = (22 / 12) / 2 # (Inch / 12 = Foot) / 2
 
         self.request_wheel_lock = False
 
@@ -85,17 +70,6 @@ class SwerveDrive:
     def chassis_dimension(self, dimension):
         self.width = dimension[0]
         self.length = dimension[1]
-
-    @property
-    def allow_reverse(self):
-        return self._allow_reverse
-
-    @allow_reverse.setter
-    def allow_reverse(self, value):
-        self._allow_reverse = value
-
-        for module in self.modules.values():
-            module.allow_reverse = value
 
     @staticmethod
     def square_input(input):
@@ -304,9 +278,6 @@ class SwerveDrive:
         """
         Prints debugging information to log
         """
-        if self.predict_position:
-            print('Position: ', self._predicted_position, '\n')
-
         if debug_modules:
             for key in self.modules:
                 self.modules[key].debug()
@@ -322,9 +293,6 @@ class SwerveDrive:
         """
         self.update_smartdash()
 
-        if self.predict_position:
-            self._predicted_position()
-        
         self._calculate_vectors()
 
         for key in self.modules:
@@ -334,24 +302,12 @@ class SwerveDrive:
 
         for key in self.modules:
             self.modules[key].execute()
-
+        
     def update_smartdash(self):
         """
         Pushes some internal variables for debugging.
         """
-        self.sd.putBoolean('drive/drive/allow_reverse', self.allow_reverse)
-        self.sd.putBoolean('drive/drive/snap_rotation', self.snap_rotation)
-        self.sd.putBoolean('drive/drive/predict_position', self.predict_position)
-
-        if self.predict_position:
-            self.sd.putNumber('drive/drive/predicted/x', self._predicted_position['strafe'])
-            self.sd.putNumber('drive/drive/predicted/y', self._predicted_position['fwd'])
-            self.sd.putNumber('drive/drive/predicted/rot', self._predicted_position['rcw'])
-
         if self.debugging:
             for key in self._requested_angles:
                 self.sd.putNumber('drive/drive/%s_angle' % key, self._requested_angles[key])
                 self.sd.putNumber('drive/drive/%s_speed' % key, self._requested_speeds[key])
-
-        for key in self.modules:
-            self.modules[key].update_smartdash()

@@ -2,124 +2,186 @@
 
 import wpilib
 
-import magicbot
-from magicbot.magic_tunable import tunable
-
 import ctre
 
-from robotpy_ext.control.button_debouncer import ButtonDebouncer
+from magicbot import MagicRobot
+from magicbot.magic_tunable import tunable
+
 from robotpy_ext.autonomous.selector import AutonomousModeSelector
 
 from networktables import NetworkTables
 from networktables.util import ntproperty
 
-from components import swervemodule, swervedrive, shooter
+from rev.color import ColorSensorV3, ColorMatch
 
-class MyRobot(magicbot.MagicRobot):
+from components import swervedrive, swervemodule, shooter, wof
+from common import color_sensor, vision
 
-    drive = swervedrive.SwerveDrive
-    shooter = shooter.Shooter
+from collections import namedtuple
+ModuleConfig = swervemodule.ModuleConfig
+
+class MyRobot(MagicRobot):
+    drive: swervedrive.SwerveDrive
+    shooter: shooter.Shooter
+    wof: wof.WheelOfFortune
+
+    frontLeftModule: swervemodule.SwerveModule
+    frontRightModule: swervemodule.SwerveModule
+    rearLeftModule: swervemodule.SwerveModule
+    rearRightModule: swervemodule.SwerveModule
+
+    frontLeftModule_cfg = ModuleConfig(sd_prefix='FrontLeft_Module', zero=2.97, inverted=True, allow_reverse=True)
+    frontRightModule_cfg = ModuleConfig(sd_prefix='FrontRight_Module', zero=2.69, inverted=False, allow_reverse=True)
+    rearLeftModule_cfg = ModuleConfig(sd_prefix='RearLeft_Module', zero=0.18, inverted=True, allow_reverse=True)
+    rearRightModule_cfg = ModuleConfig(sd_prefix='RearRight_Module', zero=4.76, inverted=False, allow_reverse=True)
+
+    shooter_leftShooterMotor: ctre.WPI_VictorSPX
+    shooter_rightShooterMotor: ctre.WPI_VictorSPX
+    shooter_intakeMotor: ctre.WPI_VictorSPX
+    shooter_beltMotor: ctre.WPI_VictorSPX
+
+    vision: vision.Vision
+    colorSensor: color_sensor.ColorSensor
 
     def createObjects(self):
-        """
-        Create basic components (motor controller, joysticks, etc.).
-        """
-        # Initialize SmartDashboard
+        # SmartDashboard
         self.sd = NetworkTables.getTable('SmartDashboard')
 
-        # Joysticks
-        self.left_joystick = wpilib.Joystick(0)
-        self.right_joystick = wpilib.Joystick(1)
-        self.gamempad = wpilib.Joystick(2)
+        # Gamepad
+        self.gamempad = wpilib.Joystick(0)
+        self.gamempad2 = wpilib.Joystick(1)
 
-        # VictorSPX Motor Controllers - Drive
-        self.frontLeftMotor = ctre.WPI_VictorSPX(0)
-        self.frontRightMotor = ctre.WPI_VictorSPX(2)
-        self.rearLeftMotor = ctre.WPI_VictorSPX(4)
-        self.rearRightMotor = ctre.WPI_VictorSPX(6)
+        # Drive Motors
+        self.frontLeftModule_driveMotor = ctre.WPI_VictorSPX(5)
+        self.frontRightModule_driveMotor = ctre.WPI_VictorSPX(8)
+        self.rearLeftModule_driveMotor = ctre.WPI_VictorSPX(4)
+        self.rearRightModule_driveMotor = ctre.WPI_VictorSPX(9)
+        
+        # Rotate Motors
+        self.frontLeftModule_rotateMotor = ctre.WPI_VictorSPX(3)
+        self.frontRightModule_rotateMotor = ctre.WPI_VictorSPX(14)
+        self.rearLeftModule_rotateMotor = ctre.WPI_VictorSPX(2)
+        self.rearRightModule_rotateMotor = ctre.WPI_VictorSPX(15)
 
-        # VictorSPX Motor Controllers - Rotate
-        self.frontLeftRotate = ctre.WPI_VictorSPX(1)
-        self.frontRightRotate = ctre.WPI_VictorSPX(3)
-        self.rearLeftRotate = ctre.WPI_VictorSPX(5)
-        self.rearRightRotate = ctre.WPI_VictorSPX(7)
+        # Encoders
+        self.frontLeftModule_encoder = wpilib.AnalogInput(0)
+        self.frontRightModule_encoder = wpilib.AnalogInput(3)
+        self.rearLeftModule_encoder = wpilib.AnalogInput(1)
+        self.rearRightModule_encoder = wpilib.AnalogInput(2)
 
-        # Absolute Encoders
-        self.frontLeftEnc = wpilib.AnalogInput(0)
-        self.frontRightEnc = wpilib.AnalogInput(1)
-        self.rearLeftEnc = wpilib.AnalogInput(2)
-        self.rearRightEnc = wpilib.AnalogInput(3)
+        # Shooter
+        self.shooter_leftShooterMotor = ctre.WPI_VictorSPX(6)
+        self.shooter_rightShooterMotor = ctre.WPI_VictorSPX(7)
+        self.shooter_beltMotor = ctre.WPI_VictorSPX(11)
+        self.shooter_intakeMotor = ctre.WPI_VictorSPX(0)
 
-        # Drive Modules
-        self.frontLeftModule = swervemodule.SwerveModule(self.frontLeftMotor, self.frontLeftRotate, self.frontLeftEnc, sd_prefix='FrontLeft_Module', zero=2.25, inverted=False)
-        self.frontRightModule = swervemodule.SwerveModule(self.frontRightMotor, self.frontRightRotate, self.frontRightEnc, sd_prefix='FrontRight_Module', zero=4.2, inverted=True)
-        self.rearLeftModule = swervemodule.SwerveModule(self.rearLeftMotor, self.rearLeftRotate, self.rearLeftEnc, sd_prefix='RearLeft_Module', zero=2.69, inverted=False)
-        self.rearRightModule = swervemodule.SwerveModule(self.rearRightMotor, self.rearRightRotate, self.rearRightEnc, sd_prefix='RearRight_Module', zero=1.44, inverted=True)
+        # Wheel of Fortune
+        self.wof_motor = ctre.WPI_VictorSPX(13)
 
-        # Shooter Motors
-        self.shooter.shooterMotor = ctre.WPI_VictorSPX(8)
-        self.shooter.beltMotor = ctre.WPI_VictorSPX(9)
+        # Climber
+        self.climbingMotor = ctre.WPI_VictorSPX(10)
+        self.hookMotor = ctre.WPI_VictorSPX(1)
 
-    def robotInit(self):
-        super().robotInit()
+        # Color Sensor
+        self.colorSensor = color_sensor.ColorSensor()
+
+        # Vision
+        self.vision = vision.Vision()
+
+        # Limit Switch
+        self.switch = wpilib.DigitalInput(0)
+
+        # PDP
+        self.pdp = wpilib.PowerDistributionPanel(0)
 
     def disabledPeriodic(self):
         self.update_sd()
 
-    def disabledInit(self):
-        pass
-
-    def autonomous(self):
-        self.drive.allow_reverse = False
-        self.drive.wait_for_align = True
+    def autonomousInit(self):
+        self.drive.flush()
         self.drive.threshold_input_vectors = True
 
+    def autonomous(self):
         super().autonomous()
 
     def teleopInit(self):
         self.drive.flush()
-        self.drive.allow_reverse = True
-        self.drive.wait_for_align = False
         self.drive.squared_inputs = True
         self.drive.threshold_input_vectors = True
 
     def move(self, x, y, rcw):
-        if self.right_joystick.getRawButton(1):
-            rcw *= 0.75
+        if self.gamempad.getRawButton(3):
+            rcw *= 0.7
 
         self.drive.move(x, y, rcw)
 
     def teleopPeriodic(self):
-        # Drive System
-        self.move(self.gamempad.getRawAxis(5) * -1, self.gamempad.getRawAxis(4) * -1, self.gamempad.getRawAxis(0))
+        # Drive
+        self.move(self.gamempad.getRawAxis(5), self.gamempad.getRawAxis(4), self.gamempad.getRawAxis(0))
 
-        # self.move(self.left_joystick.getY() * -1, self.left_joystick.getX() * -1, self.right_joystick.getX())
-        # self.move(self.left_joystick.getRawAxis(1) * -1, self.left_joystick.getRawAxis(0), self.left_joystick.getRawAxis(2) * -1 )
-
-        # Shooter
-        if self.gamempad.getRawButton(5):
-            self.shooter.shoot()
-        else:
-            self.shooter.stop()
-
-        # Lock Drivetrain
-        if self.gamempad.getRawButton(6):
+        # Lock
+        if self.gamempad.getRawButton(1):
             self.drive.request_wheel_lock = True
 
         # Vectoral Button Drive
-        if self.gamempad.getRawButton(3):
-            self.drive.set_raw_strafe(0.25)
-        elif self.gamempad.getRawButton(2):
-            self.drive.set_raw_strafe(-0.25)
-        if self.gamempad.getRawButton(4):
+        if self.gamempad.getPOV() == 0:
             self.drive.set_raw_fwd(0.35)
-        elif self.gamempad.getRawButton(1):
+        elif self.gamempad.getPOV() == 180:
             self.drive.set_raw_fwd(-0.35)
+        elif self.gamempad.getPOV() == 90:
+            self.drive.set_raw_strafe(-0.35)
+        elif self.gamempad.getPOV() == 270:
+            self.drive.set_raw_strafe(0.35)
+
+        # Climber
+        if self.gamempad2.getRawButton(1):
+            self.climbingMotor.set(1)
+        else:
+            self.climbingMotor.set(0)
+
+        # Hook
+        if self.gamempad2.getRawAxis(5) < 0 and not self.switch.get():
+            self.hookMotor.set(self.gamempad2.getRawAxis(5))
+        elif self.gamempad2.getRawAxis(5) > 0:
+            self.hookMotor.set(self.gamempad2.getRawAxis(5))
+        else:
+            self.hookMotor.set(0)
+
+        # Shooter
+        if self.gamempad.getRawAxis(3) > 0:
+            self.shooter.shoot()
+        elif self.gamempad.getRawButton(6):
+            self.shooter.align()
+        elif self.gamempad.getRawButton(5) or self.gamempad2.getRawAxis(2) > 0:
+            self.shooter.unload()
+        elif self.gamempad.getRawAxis(2) > 0 or self.gamempad2.getRawAxis(3) > 0:
+            self.shooter.intake()
+        else:
+            self.shooter.stop()
+
+        # WoF
+        if self.gamempad2.getRawButton(3):
+            self.wof.handleFirstStage()
+        elif self.gamempad2.getRawButton(2):
+            self.wof.handleSecondStage()
+        elif self.gamempad2.getRawButton(4):
+            self.wof.reset()
+        elif self.gamempad2.getRawButton(5):
+            self.wof.manualTurn(1)
+        elif self.gamempad2.getRawButton(6):
+            self.wof.manualTurn(-1)
+        else:
+            self.wof.manualTurn(0)
 
         self.update_sd()
 
     def update_sd(self):
+        self.sd.putNumber('Climb_Current_Draw', self.pdp.getCurrent(10))
+
         self.drive.update_smartdash()
+        self.colorSensor.updateSD()
+        self.wof.updateSD()
+        self.vision.updateTable()
 
 if __name__ == "__main__":
     wpilib.run(MyRobot)

@@ -1,41 +1,50 @@
 from .base_auto import BaseAuto
 
-from components import swervedrive
+from components import swervedrive, shooter
+from common import vision
 
 from magicbot.state_machine import state, timed_state, AutonomousStateMachine
 
-class Middle(BaseAuto):
-
-    MODE_NAME = "Middle"
+class Default(BaseAuto):
+    MODE_NAME = "Default"
     DEFAULT = True
 
-    #Injection
-    drive = swervedrive.SwerveDrive
+    drive: swervedrive.SwerveDrive
+    shooter: shooter.Shooter
+    vision: vision.Vision
 
-    @timed_state(duration=5, next_state="finish", first=True)
-    def drive_forward(self):
-        self.drive.set_raw_fwd(0.25)
+    @timed_state(duration=7, first=True)
+    def vision_align(self):
+        drive = self.vision.verticalAdjust()
+        rotate = self.vision.horizontalAdjust()
 
-class Left(BaseAuto):
+        if drive > 0.1 or drive < -0.1:
+            self.drive.set_raw_fwd(drive * -0.35)
+        else:
+            self.drive.set_raw_fwd(0)
+            if rotate > 0.1 or rotate < -0.1:
+                self.drive.set_raw_rcw(rotate * -0.35)
+            else:
+                self.drive.set_raw_rcw(0)
+                self.next_state('shoot')
 
-    MODE_NAME = "Left"
+        self.drive.update_smartdash()
+
+    @timed_state(duration=4, next_state="escape")
+    def shoot(self):
+        self.shooter.shoot()
+
+    @timed_state(duration=3, next_state="finish")
+    def escape(self):
+        self.shooter.stop()
+        self.drive.set_raw_fwd(-0.5)
+
+class OnlyMove(BaseAuto):
+    MODE_NAME = "Only Move"
     DEFAULT = False
 
-    #Injection
-    drive = swervedrive.SwerveDrive
+    drive: swervedrive.SwerveDrive
 
-    @timed_state(duration=5, next_state="finish", first=True)
-    def drive_left(self):
-        self.drive.set_raw_strafe(0.25)
-
-class Right(BaseAuto):
-
-    MODE_NAME = "Right"
-    DEFAULT = False
-
-    #Injection
-    drive = swervedrive.SwerveDrive
-
-    @timed_state(duration=5, next_state="finish", first=True)
-    def drive_left(self):
-        self.drive.set_raw_strafe(-0.25)
+    @timed_state(duration=3, next_state="finish", first=True)
+    def drive(self):
+        self.drive.set_raw_fwd(0.35)

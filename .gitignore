@@ -3,6 +3,9 @@
 
 #PyFrc
 .deploy_cfg
+.installer_config
+opkg_cache/
+pip_cache/
 
 #Emacs
 *~
@@ -103,3 +106,5 @@ ENV/
 
 # VSCode
 .vscode
+
+imgui.ini
