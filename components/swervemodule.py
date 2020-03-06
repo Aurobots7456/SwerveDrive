@@ -93,9 +93,9 @@ class SwerveModule:
         """
         Round the value to within 360. Set the requested rotate position (requested voltage).
         Intended to be used only by the move function.
-        """     
+        """
         self._requested_voltage = ((self.degree_to_voltage(value) + self.encoder_zero) % 5)
-        
+
     def move(self, speed, deg):
         """
         Set the requested speed and rotation of passed.
