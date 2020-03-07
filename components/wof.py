@@ -128,7 +128,7 @@ class WheelOfFortune():
             if self.inProgress and not matched_color == "N":
                 # Spin the wheel until it sees the target color
                 if not matched_color == self.target_color:
-                    self.motor.set(1)
+                    self.motor.set(0.35)
                 else:
                     self.motor.set(0)
                     self.reset()
