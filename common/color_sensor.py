@@ -36,7 +36,7 @@ class ColorSensor():
         color = self.getColor()
         # Match the color with 90% of confidence
         self.match = self.colorMatcher.matchClosestColor(color, 0.9)
-        print(color)
+        # print(color)
 
         # Return the first letter of the color that matches the sensor value.
         if (self.match == self.kBlue):
