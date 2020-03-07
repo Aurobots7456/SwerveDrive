@@ -37,7 +37,7 @@ class Default(BaseAuto):
     @timed_state(duration=3, next_state="finish")
     def escape(self):
         self.shooter.stop()
-        self.drive.set_raw_fwd(-0.5)
+        self.drive.set_raw_fwd(0.5)
 
 class OnlyMove(BaseAuto):
     MODE_NAME = "Only Move"
