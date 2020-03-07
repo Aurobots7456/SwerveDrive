@@ -10,10 +10,10 @@ class ColorSensor():
         self.colorMatcher = ColorMatch()
 
         # Create possible colors to match from
-        self.kBlue = Color(0.163, 0.444, 0.390)
-        self.kGreen = Color(0.164, 0.548, 0.255)
-        self.kRed = Color(0.561, 0.232, 0.114)
-        self.kYellow = Color(0.361, 0.524, 0.113)
+        self.kBlue = Color(0.167, 0.446, 0.385)
+        self.kGreen = Color(0.202, 0.535, 0.261)
+        self.kRed = Color(0.395, 0.409, 0.195)
+        self.kYellow = Color(0.302, 0.542, 0.155)
         
         # Add the colors to the matcher as options
         self.colorMatcher.addColorMatch(self.kBlue)
@@ -36,7 +36,7 @@ class ColorSensor():
         color = self.getColor()
         # Match the color with 90% of confidence
         self.match = self.colorMatcher.matchClosestColor(color, 0.9)
-        # print(color)
+        print(color)
 
         # Return the first letter of the color that matches the sensor value.
         if (self.match == self.kBlue):

@@ -24,7 +24,7 @@ class Vision():
     target_height = 98.25 # Target's mid-point's height from the ground in inches
     target_distance = 120 # Desired distance from the wall to shoot
 
-    debug = False
+    debug = True
 
     def getValues(self):
         '''
@@ -60,6 +60,8 @@ class Vision():
         :return: Clamped error [-1, 1]
         '''
         error = self.ty
+        if error < 0.5 and error > -0.5:
+            error = 0
         adjust = max(min(error, 1), -1)
         return adjust
 
@@ -69,6 +71,8 @@ class Vision():
         :return: Clamped error [-1, 1]
         '''
         error = self.tx
+        if error < 0.5 and error > -0.5:
+            error = 0
         adjust = max(min(error, 1), -1)
         return adjust
 

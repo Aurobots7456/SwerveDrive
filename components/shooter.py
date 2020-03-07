@@ -39,15 +39,14 @@ class Shooter(StateMachine):
         drive = self.vision.verticalAdjust()
         rotate = self.vision.horizontalAdjust()
 
-        if drive > 0.1 or drive < -0.1:
+        if not drive == 0:
             self.drive.set_raw_fwd(drive * 0.35)
         else:
             self.drive.set_raw_fwd(0)
-            if rotate > 0.1 or rotate < -0.1:
+            if not rotate == 0:
                 self.drive.set_raw_rcw(rotate * 0.35)
             else:
                 self.drive.set_raw_rcw(0)
-                self.shoot()
 
     def shoot(self):
         self.engage()
@@ -58,11 +57,11 @@ class Shooter(StateMachine):
 
     @timed_state(duration=0.5, next_state="feedShooter")
     def spinup(self):
-        self.shooter_speed = 0.8
+        self.shooter_speed = 0.75
 
     @state
     def feedShooter(self):
-        self.shooter_speed = 0.8
+        self.shooter_speed = 0.75
         self.belt_speed = 0.5
 
     def execute(self):
