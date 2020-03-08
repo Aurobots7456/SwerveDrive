@@ -13,7 +13,7 @@ class Default(BaseAuto):
     shooter: shooter.Shooter
     vision: vision.Vision
 
-    @timed_state(duration=7, first=True)
+    @timed_state(duration=7, first=True, next_state="shoot")
     def vision_align(self):
         drive = self.vision.verticalAdjust()
         rotate = self.vision.horizontalAdjust()
@@ -34,7 +34,22 @@ class Default(BaseAuto):
     def shoot(self):
         self.shooter.shoot()
 
-    @timed_state(duration=3, next_state="finish")
+    @timed_state(duration=2.5, next_state="finish")
+    def escape(self):
+        self.shooter.stop()
+        self.drive.set_raw_fwd(0.5)
+
+class OnlyShoot(BaseAuto):
+    MODE_NAME = "Only Shoot"
+    DEFAULT = False
+
+    drive: swervedrive.SwerveDrive
+
+    @timed_state(duration=4, first=True, next_state="escape")
+    def shoot(self):
+        self.shooter.shoot()
+
+    @timed_state(duration=2.5, next_state="finish")
     def escape(self):
         self.shooter.stop()
         self.drive.set_raw_fwd(0.5)
