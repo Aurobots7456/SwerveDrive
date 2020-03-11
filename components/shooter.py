@@ -57,11 +57,11 @@ class Shooter(StateMachine):
 
     @timed_state(duration=0.5, first=True, next_state="feedShooter")
     def spinup(self):
-        self.shooter_speed = 0.85
+        self.shooter_speed = 0.7
 
     @state
     def feedShooter(self):
-        self.shooter_speed = 0.85
+        self.shooter_speed = 0.7
         self.belt_speed = 0.5
 
     def execute(self):
