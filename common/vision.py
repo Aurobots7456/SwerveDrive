@@ -39,6 +39,12 @@ class Vision():
 
     @staticmethod
     def degree_to_rad(degree):
+        """
+        Convert a given degree value to rad.
+
+        :param degree: a degree value between 0 and 360
+        :returns: the radian value betwen 0 and 2pi
+        """
         return degree * math.pi / 180
 
     def getDistance(self):

@@ -10,6 +10,9 @@ class ColorSensor():
         self.colorMatcher = ColorMatch()
 
         # Create possible colors to match from
+        # These values need to change for different environments.
+        # Use the print(color) line in the mathColor function to see the color values.
+        # Get the values from the driver station's console and adjust these values.
         self.kBlue = Color(0.167, 0.446, 0.385)
         self.kGreen = Color(0.202, 0.535, 0.261)
         self.kRed = Color(0.395, 0.409, 0.195)
@@ -24,19 +27,22 @@ class ColorSensor():
     def getColor(self):
         '''
         Get the current color from the sensor in raw format.
-        :return: frc::Color class with normalized sRGB values
+        :returns: frc::Color class with normalized sRGB values
         '''
         return self.colorSensor.getColor()
 
     def matchColor(self):
         '''
         Match the raw color output from the sensor with an option.
-        :return: First letter of the color (R / G / B / Y) or N for none.
+        :returns: First letter of the color (R / G / B / Y) or N for none.
         '''
         color = self.getColor()
         # Match the color with 90% of confidence
         self.match = self.colorMatcher.matchClosestColor(color, 0.9)
+        # TODO: Adjust color values using the print function.
         # print(color)
+        # If you don't see the prints in the DS, press the config button (gear)
+        # on the top left of the consol and select "+ Prints" option.
 
         # Return the first letter of the color that matches the sensor value.
         if (self.match == self.kBlue):

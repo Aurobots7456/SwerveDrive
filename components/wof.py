@@ -29,12 +29,12 @@ class WheelOfFortune():
         self.inProgress = False # Indicates that a function is already running
 
     def getData(self):
-        '''
+        """
         Get the color from the driver station.
         If the color is not released yet, returns "N".
 
         :return: First letter of the color (R / G / B / Y) or N for none.
-        '''
+        """
         # Get the game specific message from the driver station
         match_data = wpilib.DriverStation.getGameSpecificMessage(wpilib.DriverStation.getInstance())
 
@@ -46,18 +46,18 @@ class WheelOfFortune():
         return "N"
 
     def manualTurn(self, speed):
-        '''
+        """
         Manualy set the speed of the WoF motor.
         :param speed: [-1, 1]
-        '''
+        """
         self.motor.set(speed)
 
     def reset(self):
-        '''
+        """
         Reset all the variables to the initial state.
         Unless you intend to change the phase or restart the current phase,
         do not use this function.
-        '''
+        """
         self.phase = 0
         self.target_color = "N"
         self.next_color = ""
@@ -66,11 +66,11 @@ class WheelOfFortune():
         self.isCounted = False
 
     def handleFirstStage(self):
-        '''
+        """
         Automatically complete the first wheel of fortune objective (spin it 3 to 5 turns).
         Once started, the function will get the current color and spin the wheel until
         it sees the color 8 more times.
-        '''
+        """
         self.phase = 1 # Set the phase to 1
         matched_color = self.colorSensor.matchColor() # Get the current color
 
@@ -105,11 +105,11 @@ class WheelOfFortune():
                 # self.reset()
 
     def handleSecondStage(self):
-        '''
+        """
         Automatically complete the second wheel of fortune objective (spin it to a specific color).
         Once started, the function will get the objective color from the FMS and spin the wheel until
         that color is under the field's color sensor.
-        '''
+        """
         self.phase = 2 # Set the phase to 2
 
         if not self.getData() == "N": # If the game data is released
@@ -134,6 +134,7 @@ class WheelOfFortune():
                     self.reset()
 
     def execute(self):
+        # Do not execute anything
         return
 
     def updateSD(self):

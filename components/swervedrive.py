@@ -7,15 +7,17 @@ from networktables import NetworkTables
 from networktables.util import ntproperty
 
 class SwerveDrive:
+    # These modules will be injected from ../robot.py
     frontLeftModule: swervemodule.SwerveModule
     frontRightModule: swervemodule.SwerveModule
     rearLeftModule: swervemodule.SwerveModule
     rearRightModule: swervemodule.SwerveModule
 
+    # Get some config options from the dashboard.
     lower_input_thresh = ntproperty('/SmartDashboard/drive/drive/lower_input_thresh', 0.1)
     rotation_multiplier = ntproperty('/SmartDashboard/drive/drive/rotation_multiplier', 0.5)
     xy_multiplier = ntproperty('/SmartDashboard/drive/drive/xy_multiplier', 0.65)
-    debugging = ntproperty('/SmartDashboard/drive/drive/debugging', False)
+    debugging = ntproperty('/SmartDashboard/drive/drive/debugging', False) # Turn to true to run it in verbose mode.
 
     def setup(self):
         """
@@ -77,6 +79,12 @@ class SwerveDrive:
     
     @staticmethod
     def normalize(data):
+        """
+        Get the maximum value in the data. If the max is more than 1,
+        divide each data by that max.
+        :param data: The data to be normalized
+        :returns: The normalized data
+        """
         maxMagnitude = max(abs(x) for x in data)
 
         if maxMagnitude > 1.0:
@@ -87,6 +95,12 @@ class SwerveDrive:
 
     @staticmethod
     def normalizeDictionary(data):
+        """
+        Get the maximum value in the data. If the max is more than 1,
+        divide each data by that max.
+        :param data: The dictionary with the data to be normalized
+        :returns: The normalized dictionary with the data
+        """
         maxMagnitude = max(abs(x) for x in data.values())
 
         if maxMagnitude > 1.0:
@@ -98,6 +112,7 @@ class SwerveDrive:
     def flush(self):
         """
         This method should be called to reset all requested values of the drive system.
+        It will also flush each module individually.
         """
         self._requested_vectors = {
             'fwd': 0,
@@ -189,9 +204,9 @@ class SwerveDrive:
         """
         Calulates the speed and angle for each wheel given the requested movement
 
-        Positive fwd value = Forward robot movement
-        Negative fwd value = Backward robot movement
-        Positive strafe value = Left robot movement
+        Positive fwd value = Forward robot movement\n
+        Negative fwd value = Backward robot movement\n
+        Positive strafe value = Left robot movement\n
         Negative strafe value = Right robot movement
 
         :param fwd: the requested movement in the Y direction 2D plane
@@ -293,13 +308,17 @@ class SwerveDrive:
         """
         self.update_smartdash()
 
+        # Calculate each vector
         self._calculate_vectors()
 
+        # Set the speed and angle for each module
         for key in self.modules:
             self.modules[key].move(self._requested_speeds[key], self._requested_angles[key])
 
+        # Reset the speed back to zero
         self._requested_speeds = dict.fromkeys(self._requested_speeds, 0)
 
+        # Execute each module
         for key in self.modules:
             self.modules[key].execute()
         

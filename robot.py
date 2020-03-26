@@ -5,7 +5,6 @@ import wpilib
 import ctre
 
 from magicbot import MagicRobot
-from magicbot.magic_tunable import tunable
 
 from robotpy_ext.autonomous.selector import AutonomousModeSelector
 
@@ -18,9 +17,27 @@ from components import swervedrive, swervemodule, shooter, wof
 from common import color_sensor, vision
 
 from collections import namedtuple
+# Get the config preset from the swervemodule
 ModuleConfig = swervemodule.ModuleConfig
 
 class MyRobot(MagicRobot):
+    """
+    After creating low-level components like "shooter", use component's name and an underscore
+    to inject objects to the component.
+    
+    e.g.
+    Using variable annotation like "shooter_beltMotor: ctre.WPI_VictorSPX" decleares the type of the variable.
+    When beltMotor is called from the shooter component, it's going to be a VictorSPX object.
+
+    Using equal sign for variable decleration like "shooter_beltMotor = ctre.WPI_VictorSPX(11)" creates the actual object.
+    When beltMotor is called from the shooter component, it's going to be a VictorSPX at the can port 11.
+
+    Use the equal sign (mostly) in the #createObjects function so they can be correctly injected to their parent components.
+
+    For more info refer to https://robotpy.readthedocs.io/en/stable/frameworks/magicbot.html
+    """
+
+    # Create low-level object
     drive: swervedrive.SwerveDrive
     shooter: shooter.Shooter
     wof: wof.WheelOfFortune
@@ -30,20 +47,27 @@ class MyRobot(MagicRobot):
     rearLeftModule: swervemodule.SwerveModule
     rearRightModule: swervemodule.SwerveModule
 
+    # Create configs for each module. This is before #createObjects because modules need these configs to be initialized.
     frontLeftModule_cfg = ModuleConfig(sd_prefix='FrontLeft_Module', zero=2.97, inverted=True, allow_reverse=True)
     frontRightModule_cfg = ModuleConfig(sd_prefix='FrontRight_Module', zero=2.69, inverted=False, allow_reverse=True)
     rearLeftModule_cfg = ModuleConfig(sd_prefix='RearLeft_Module', zero=0.18, inverted=True, allow_reverse=True)
     rearRightModule_cfg = ModuleConfig(sd_prefix='RearRight_Module', zero=4.76, inverted=False, allow_reverse=True)
 
+    # Decleare motors for the shooter component
     shooter_leftShooterMotor: ctre.WPI_VictorSPX
     shooter_rightShooterMotor: ctre.WPI_VictorSPX
     shooter_intakeMotor: ctre.WPI_VictorSPX
     shooter_beltMotor: ctre.WPI_VictorSPX
 
+    # Create common components
     vision: vision.Vision
     colorSensor: color_sensor.ColorSensor
 
     def createObjects(self):
+        """
+        This is where all the components are actually created with "=" sign.
+        Components with a parent prefix like "shooter_" will be injected.
+        """
         # SmartDashboard
         self.sd = NetworkTables.getTable('SmartDashboard')
 
@@ -95,22 +119,35 @@ class MyRobot(MagicRobot):
         self.pdp = wpilib.PowerDistributionPanel(0)
 
     def disabledPeriodic(self):
+        # Update the dashboard, even when the robot is disabled.
         self.update_sd()
 
     def autonomousInit(self):
+        # Reset the drive when the auto starts.
         self.drive.flush()
         self.drive.threshold_input_vectors = True
 
     def autonomous(self):
+        # For auto, use MagicBot's auto mode.
+        # This will load the ./autonomous folder.
         super().autonomous()
 
     def teleopInit(self):
+        # Reset the drive when the teleop starts.
         self.drive.flush()
         self.drive.squared_inputs = True
         self.drive.threshold_input_vectors = True
 
     def move(self, x, y, rcw):
+        """
+        This function is ment to be used by the teleOp.
+        :param x: Velocity in x axis [-1, 1]
+        :param y: Velocity in y axis [-1, 1]
+        :param rcw: Velocity in z axis [-1, 1]
+        """
+
         if self.gamempad.getRawButton(3):
+            # If the button is pressed, lower the rotate speed.
             rcw *= 0.7
 
         self.drive.move(x, y, rcw)
@@ -173,9 +210,14 @@ class MyRobot(MagicRobot):
         else:
             self.wof.manualTurn(0)
 
+        # Update smartdashboard
         self.update_sd()
 
     def update_sd(self):
+        """
+        Calls each component's own update function
+        and puts data to the smartdashboard.
+        """
         self.sd.putNumber('Climb_Current_Draw', self.pdp.getCurrent(10))
 
         self.drive.update_smartdash()
